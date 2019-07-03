@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "cardboard-vr-display": "^1.0.16",
-    "gl-matrix": "^2.8.1"
+    "gl-matrix": "^2.8.1",
+    "serve": "^11.0.2"
   }
 }
