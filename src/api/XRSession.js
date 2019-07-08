@@ -196,7 +196,7 @@ export default class XRSession extends EventTarget {
   /**
    * @return {XRFrameOfReference}
    */
-  async requestFrameOfReference(type, options={}) {
+  async requestReferenceSpace(type, options={}) {
     if (this[PRIVATE].ended) {
       return;
     }
