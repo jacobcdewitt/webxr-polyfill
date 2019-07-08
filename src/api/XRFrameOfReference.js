@@ -20,7 +20,15 @@ const DEFAULT_EMULATION_HEIGHT = 1.6;
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRFrameOfReference');
 
-export const XRFrameOfReferenceTypes = ['head-model', 'eye-level', 'stage'];
+// TODO: Check for these types instead of the old "head-model", "eye-level",
+// and "stage".
+export const XRFrameOfReferenceTypes = [
+  'viewer',
+  'local',
+  'local-floor',
+  'bounded-floor',
+  'unbounded'
+];
 
 export const XRFrameOfReferenceOptions = Object.freeze({
   disableStageEmulation: false,
