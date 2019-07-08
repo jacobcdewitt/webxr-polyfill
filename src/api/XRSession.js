@@ -46,6 +46,8 @@ export default class XRSession extends EventTarget {
       suspended: false,
       suspendedCallback: null,
       id,
+      activeRenderState: null,
+      pendingRenderState: null,
     };
 
     const frame = new XRFrame(device, this, this[PRIVATE].id);
@@ -136,6 +138,8 @@ export default class XRSession extends EventTarget {
     this.onselectstart = undefined;
     this.onselectend = undefined;
   }
+
+  get renderState() { return this[PRIVATE].activeRenderState; }
 
   /**
    * @return {boolean}
@@ -260,7 +264,19 @@ export default class XRSession extends EventTarget {
       this[PRIVATE].suspendedCallback = callback;
     }
 
+    // TODO: Should pending render state be applied before or after onFrameStart?
     return this[PRIVATE].device.requestAnimationFrame(() => {
+      if (this[PRIVATE].pendingRenderState !== null) {
+        // Apply pending render state.
+        this[PRIVATE].activeRenderState = this[PRIVATE].pendingRenderState;
+        this[PRIVATE].pendingRenderState = null;
+        // TODO: clamp inlineVerticalFieldOfView to range
+        // TODO: set compositionDisabled
+
+        // Report to the device since it'll need
+        // to handle the layer for rendering
+        this[PRIVATE].device.onBaseLayerSet(this[PRIVATE].id, this[PRIVATE].activeRenderState.baseLayer);
+      }
       this[PRIVATE].device.onFrameStart(this[PRIVATE].id);
       callback(now(), this[PRIVATE].frame);
       this[PRIVATE].device.onFrameEnd(this[PRIVATE].id);
@@ -310,5 +326,37 @@ export default class XRSession extends EventTarget {
     }
 
     return this[PRIVATE].device.endSession(this[PRIVATE].id);
+  }
+
+  // The updateRenderState() method queues an update to the active render state
+  // to be applied on the next frame. Unset fields of the XRRenderStateInit
+  // passed to this method will not be changed.
+  updateRenderState(newState) {
+    if (this[PRIVATE].ended) {
+      const message = "Can't call updateRenderState on an XRSession " +
+                      "that has already ended.";
+      throw new Error(message);
+    }
+
+    if (newState.baseLayer && (newState.baseLayer.session !== this)) {
+      const message = "Called updateRenderState with a base layer that was " +
+                      "created by a different session.";
+      throw new Error(message);
+    }
+
+    const fovSet = (newState.inlineVerticalFieldOfView !== null) &&
+                   (newState.inlineVerticalFieldOfView !== undefined);
+
+    if (this[PRIVATE].immersive && fovSet) {
+      const message = "inlineVerticalFieldOfView must not be set for an " +
+                      "XRRenderState passed to updateRenderState for an " +
+                      "immersive session.";
+      throw new Error(message);
+    }
+
+    if (this[PRIVATE].pendingRenderState === null) {
+      // Clone pendingRenderState and override any fields that are set by newState.
+      this[PRIVATE].pendingRenderState = Object.assign({}, this[PRIVATE].activeRenderState, newState);
+    }
   }
 }

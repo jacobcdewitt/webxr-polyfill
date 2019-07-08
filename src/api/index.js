@@ -29,6 +29,7 @@ import XRFrameOfReference from './XRFrameOfReference';
 import XRStageBounds from './XRStageBounds';
 import XRStageBoundsPoint from './XRStageBoundsPoint';
 import XRRay from './XRRay';
+import XRRenderState from './XRRenderState';
 
 /**
  * Everything exposed here will also be attached to the window
@@ -50,4 +51,5 @@ export default {
   XRInputPose,
   XRInputSource,
   XRRay,
+  XRRenderState,
 };

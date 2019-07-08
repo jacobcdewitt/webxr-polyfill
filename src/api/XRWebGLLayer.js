@@ -61,6 +61,7 @@ export default class XRWebGLLayer extends XRLayer {
       context,
       config,
       framebuffer,
+      session,
     };
   }
 
@@ -95,4 +96,7 @@ export default class XRWebGLLayer extends XRLayer {
    * @return {number}
    */
   get framebufferHeight() { return this[PRIVATE].context.drawingBufferHeight; }
+
+  // Only used internally.
+  get session() { return this[PRIVATE].session; }
 }
