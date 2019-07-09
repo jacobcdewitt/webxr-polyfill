@@ -61,22 +61,22 @@ export default class XRReferenceSpace extends XRSpace {
     // and the XRDevice did not provide a transform, this is an invalid
     // configuration and we shouldn't emulate here. XRSession.requestFrameOfReference
     // should check this as well.
-    if (type === 'bounded-floor' && options.disableStageEmulation && !transform) {
+    if (this._isFloor(type) && options.disableStageEmulation && !transform) {
       throw new Error(`XRReferenceSpace cannot use 'bounded-floor' type, if disabling emulation and platform does not provide`);
     }
 
     const { disableStageEmulation, stageEmulationHeight } = options;
 
     let emulatedHeight = 0;
-    // If we're using stage reference and no transform, we're emulating.
+    // If we're using floor-level reference and no transform, we're emulating.
     // Set emulated height from option or use the default
-    if (type === 'bounded-floor' && !transform) {
+    if (this._isFloor(type) && !transform) {
       emulatedHeight = stageEmulationHeight !== 0 ? stageEmulationHeight : DEFAULT_EMULATION_HEIGHT;
     }
 
     // If we're emulating the stage, and the device did not provide
     // a transform, create one here
-    if (type === 'bounded-floor' && !transform) {
+    if (this._isFloor(type) && !transform) {
       // Apply emulatedHeight to the `y` translation
       transform = mat4.identity(new Float32Array(16));
       transform[13] = emulatedHeight;
@@ -97,6 +97,10 @@ export default class XRReferenceSpace extends XRSpace {
       options,
     };
     this.onboundschange = undefined;
+  }
+
+  _isFloor(type) {
+    return type === 'bounded-floor' || type === 'local-floor';
   }
 
   /**
