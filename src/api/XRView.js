@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
+import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
+
 import XRViewport from './XRViewport';
+import XRRigidTransform from './XRRigidTransform';
 
 const XREyes = ['left', 'right'];
 
@@ -42,6 +45,7 @@ export default class XRView {
       viewport,
       temp,
       sessionId,
+      transform: null,
     };
   }
 
@@ -54,6 +58,14 @@ export default class XRView {
    * @return {Float32Array}
    */
   get projectionMatrix() { return this[PRIVATE].device.getProjectionMatrix(this.eye); }
+
+  get transform() { return this[PRIVATE].transform; }
+
+  _updateViewMatrix(viewMatrix) {
+    let invMatrix = mat4.identity(new Float32Array(16));
+    mat4.invert(invMatrix, viewMatrix);
+    this[PRIVATE].transform = new XRRigidTransform(invMatrix);
+  }
 
   /**
    * NON-STANDARD

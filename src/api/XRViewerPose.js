@@ -47,6 +47,14 @@ export default class XRViewerPose {
     throw new Error(`view is not a valid XREye`);
   }
 
+  get views() {
+    return this[PRIVATE].views;
+  }
+
+  set views(value) {
+    this[PRIVATE].views = value;
+  }
+
   /**
    * NON-STANDARD
    *
@@ -68,6 +76,14 @@ export default class XRViewerPose {
       frameOfRef.transformBaseViewMatrix(this[PRIVATE].rightViewMatrix,
                                          rightViewMatrix,
                                          this[PRIVATE].poseModelMatrix);
+    }
+
+    for (let view of this[PRIVATE].views) {
+      if (view.eye == "left") {
+        view._updateViewMatrix(this[PRIVATE].leftViewMatrix);
+      } else if (view.eye == "right") {
+        view._updateViewMatrix(this[PRIVATE].rightViewMatrix);
+      }
     }
   }
 }

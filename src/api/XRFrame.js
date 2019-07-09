@@ -36,6 +36,8 @@ export default class XRFrame {
       views.push(new XRView(device, 'right', sessionId));
     }
 
+    viewerPose.views = views;
+
     this[PRIVATE] = {
       device,
       viewerPose,
