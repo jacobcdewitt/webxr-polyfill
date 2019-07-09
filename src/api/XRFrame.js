@@ -75,7 +75,7 @@ export default class XRFrame {
   }
 
   getPose(space, baseSpace) {
-    let inputPose = this._getInputPose(space.inputSource, baseSpace);
+    let inputPose = this._getInputPose(space._inputSource, baseSpace);
     if (!inputPose) {
       return null;
     }

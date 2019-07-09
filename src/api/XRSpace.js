@@ -18,13 +18,18 @@ import EventTarget from '../lib/EventTarget';
 export const PRIVATE = Symbol('@@webxr-polyfill/XRSpace');
 
 export default class XRSpace {
-  constructor(specialType = null) {
+  constructor(specialType = null, inputSource = null) {
     this[PRIVATE] = {
       specialType,
+      inputSource,
     };
   }
 
   get _specialType() {
     return this[PRIVATE].specialType;
+  }
+
+  get _inputSource() {
+    return this[PRIVATE].inputSource;
   }
 }

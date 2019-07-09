@@ -28,8 +28,8 @@ export default class XRInputSource {
   constructor(impl) {
     this[PRIVATE] = {
       impl,
-      gripSpace: new XRSpace("grip"),
-      targetRaySpace: new XRSpace("target-ray"),
+      gripSpace: new XRSpace("grip", this),
+      targetRaySpace: new XRSpace("target-ray", this),
     };
   }
 

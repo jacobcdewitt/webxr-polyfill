@@ -14,6 +14,8 @@
  */
 
 import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
+import * as vec3 from 'gl-matrix/src/gl-matrix/vec3';
+import * as quat from 'gl-matrix/src/gl-matrix/quat';
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRRigidTransform');
 
@@ -38,9 +40,16 @@ export default class XRRigidTransform {
     this[PRIVATE] = {
       matrix,
       inverse,
-      position: null,
-      orientation: null,
     }
+
+    // Decompose matrix into position and orientation.
+    let position = vec3.create();
+    mat4.getTranslation(position, matrix);
+    this[PRIVATE].position = DOMPointReadOnly.fromPoint({x: position[0], y: position[1], z: position[2]});
+
+    let orientation = quat.create();
+    mat4.getRotation(orientation, matrix);
+    this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({x: orientation[0], y: orientation[1], z: orientation[2], w: orientation[3]});
   }
 
   get matrix() { return this[PRIVATE].matrix; }
