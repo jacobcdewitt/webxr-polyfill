@@ -31,6 +31,7 @@ import XRStageBoundsPoint from './XRStageBoundsPoint';
 import XRRay from './XRRay';
 import XRRenderState from './XRRenderState';
 import XRRigidTransform from './XRRigidTransform';
+import XRPose from './XRPose';
 
 /**
  * Everything exposed here will also be attached to the window
@@ -54,4 +55,5 @@ export default {
   XRRay,
   XRRenderState,
   XRRigidTransform,
+  XRPose,
 };

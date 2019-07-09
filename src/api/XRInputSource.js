@@ -1,3 +1,5 @@
+import XRSpace from "./XRSpace";
+
 /*
  * Copyright 2018 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +15,8 @@
  * limitations under the License.
  */
 
+// import XRSpace from './XRSpace';
+
 export const PRIVATE = Symbol('@@webxr-polyfill/XRInputSource');
 
 export default class XRInputSource {
@@ -23,7 +27,9 @@ export default class XRInputSource {
    */
   constructor(impl) {
     this[PRIVATE] = {
-      impl
+      impl,
+      gripSpace: new XRSpace("grip"),
+      targetRaySpace: new XRSpace("target-ray"),
     };
   }
 
@@ -36,4 +42,15 @@ export default class XRInputSource {
    * @return {XRPointerOrigin}
    */
   get targetRayMode() { return this[PRIVATE].impl.targetRayMode; }
+
+  get gripSpace() {
+    let mode = this[PRIVATE].impl.targetRayMode;
+    if (mode === "gaze" || mode === "screen") {
+      // grip space must be null for non-trackable input sources
+      return null;
+    }
+    return this[PRIVATE].gripSpace;
+  }
+
+  get targetRaySpace() { return this[PRIVATE].targetRaySpace; }
 }

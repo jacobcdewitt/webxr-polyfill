@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2019 Google Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,16 @@
  * limitations under the License.
  */
 
-import EventTarget from '../lib/EventTarget';
+export const PRIVATE = Symbol('@@webxr-polyfill/XRPose');
 
-export const PRIVATE = Symbol('@@webxr-polyfill/XRSpace');
-
-export default class XRSpace {
-  constructor(specialType = null) {
+export default class XRPose {
+  constructor(transform, emulatedPosition) {
     this[PRIVATE] = {
-      specialType,
+      transform,
+      emulatedPosition,
     };
   }
 
-  get _specialType() {
-    return this[PRIVATE].specialType;
-  }
+  get transform() { return this[PRIVATE].transform; }
+  get emulatedPosition() { return this[PRIVATE].emulatedPosition; }
 }

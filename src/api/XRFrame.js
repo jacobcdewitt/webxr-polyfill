@@ -70,7 +70,20 @@ export default class XRFrame {
    * @param {XRSpace} space
    * @return {XRInputPose?}
    */
-  getInputPose(inputSource, space) {
+  _getInputPose(inputSource, space) {
     return this[PRIVATE].device.getInputPose(inputSource, space);
+  }
+
+  getPose(space, baseSpace) {
+    let inputPose = this._getInputPose(space.inputSource, baseSpace);
+    if (!inputPose) {
+      return null;
+    }
+    if (space._specialType == "target-ray") {
+      return new XRPose(new XRRigidTransform(inputPose.targetRay.transformMatrix), inputPose.emulatedPosition);
+    } else if (space._specialType == "grip") {
+      return new XRPose(new XRRigidTransform(inputPose.gripMatrix), inputPose.emulatedPosition);
+    }
+    return null;
   }
 }
