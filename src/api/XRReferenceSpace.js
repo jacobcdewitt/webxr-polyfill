@@ -191,7 +191,6 @@ export default class XRReferenceSpace extends XRSpace {
 
     newSpace[PRIVATE].transform = mat4.identity(new Float32Array(16));
     mat4.multiply(newSpace[PRIVATE].transform, newSpace[PRIVATE].transform, originOffset.matrix);
-    console.log(originOffset.matrix);
     return newSpace;
   }
 }
