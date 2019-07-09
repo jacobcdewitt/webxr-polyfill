@@ -45,8 +45,7 @@ export const poseMatrixToXRRay = poseMatrix => {
   vec3.normalize(rayDirection, rayDirection);
 
   return new XRRay(new DOMPointReadOnly(rayOrigin[0], rayOrigin[1], rayOrigin[2], 1.0),
-                   new DOMPointReadOnly(rayDirection[0], rayDirection[1], rayDirection[2], 0.0),
-                   poseMatrix);
+                   new DOMPointReadOnly(rayDirection[0], rayDirection[1], rayDirection[2], 0.0));
 };
 
 

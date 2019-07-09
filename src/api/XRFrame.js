@@ -80,7 +80,7 @@ export default class XRFrame {
       return null;
     }
     if (space._specialType == "target-ray") {
-      return new XRPose(new XRRigidTransform(inputPose.targetRay.transformMatrix), inputPose.emulatedPosition);
+      return new XRPose(new XRRigidTransform(inputPose.targetRay.matrix), inputPose.emulatedPosition);
     } else if (space._specialType == "grip") {
       return new XRPose(new XRRigidTransform(inputPose.gripMatrix), inputPose.emulatedPosition);
     }
