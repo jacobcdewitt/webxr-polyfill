@@ -20,6 +20,18 @@ export const PRIVATE = Symbol('@@webxr-polyfill/XRRigidTransform');
 // TODO: Decompose matrix into position and orientation.
 // TODO: Implement constructor that takes position and orientation instead of a matrix.
 export default class XRRigidTransform {
+  constructor(position = null, orientation = null) {
+    if (!position) {
+      position = [0, 0, 0, 1];
+    }
+
+    if (!orientation) {
+      orientation = [0, 0, 0, 1];
+    }
+
+    // TODO: Compose matrix from position and orientation.
+  }
+
   constructor(matrix, inverse = null) {
     this[PRIVATE] = {
       matrix,
@@ -39,5 +51,11 @@ export default class XRRigidTransform {
     }
 
     return this[PRIVATE].inverse;
+  }
+
+  _multiply(otherTransform) {
+    let newMatrix = mat4.identity(new Float32Array(16));
+    mat4.multiply(newMatrix, this[PRIVATE].matrix, otherTransform[PRIVATE].matrix);
+    return new XRRigidTransform(newMatrix, this[PRIVATE].inverse);
   }
 }

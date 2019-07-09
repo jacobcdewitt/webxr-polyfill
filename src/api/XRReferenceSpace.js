@@ -82,6 +82,10 @@ export default class XRReferenceSpace extends XRSpace {
       transform[13] = emulatedHeight;
     }
 
+    if (!transform) {
+      transform = mat4.identity(new Float32Array(16));
+    }
+
     this[PRIVATE] = {
       disableStageEmulation,
       stageEmulationHeight,
@@ -90,6 +94,7 @@ export default class XRReferenceSpace extends XRSpace {
       transform,
       device,
       bounds,
+      options,
     };
     this.onboundschange = undefined;
   }
@@ -165,5 +170,24 @@ export default class XRReferenceSpace extends XRSpace {
     }
 
     return out;
+  }
+
+  /**
+   * Doesn't update the bound geometry for bounded reference spaces.
+   * @param {XRRigidTransform} originOffset
+   * @return {XRReferenceSpace}
+  */
+  getOffsetReferenceSpace(originOffset) {
+    let newSpace = new XRReferenceSpace(
+      this[PRIVATE].device,
+      this[PRIVATE].type,
+      this[PRIVATE].options,
+      this[PRIVATE].transform, // Will be replace with a new transform.
+      this[PRIVATE].bounds);
+
+    newSpace[PRIVATE].transform = mat4.identity(new Float32Array(16));
+    mat4.multiply(newSpace[PRIVATE].transform, newSpace[PRIVATE].transform, originOffset.matrix);
+    console.log(originOffset.matrix);
+    return newSpace;
   }
 }
