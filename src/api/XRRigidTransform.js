@@ -20,6 +20,7 @@ export const PRIVATE = Symbol('@@webxr-polyfill/XRRigidTransform');
 // TODO: Decompose matrix into position and orientation.
 // TODO: Implement constructor that takes position and orientation instead of a matrix.
 export default class XRRigidTransform {
+  /*
   constructor(position = null, orientation = null) {
     if (!position) {
       position = [0, 0, 0, 1];
@@ -31,6 +32,7 @@ export default class XRRigidTransform {
 
     // TODO: Compose matrix from position and orientation.
   }
+  */
 
   constructor(matrix, inverse = null) {
     this[PRIVATE] = {
