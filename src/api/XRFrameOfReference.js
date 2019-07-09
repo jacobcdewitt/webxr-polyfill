@@ -20,8 +20,9 @@ const DEFAULT_EMULATION_HEIGHT = 1.6;
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRFrameOfReference');
 
-// TODO: Check for these types instead of the old "head-model", "eye-level",
-// and "stage".
+// TODO: Code is handling 'local' and 'bounded-floor' reference space types,
+// but probably needs to check for the other types and make some adjustments
+// accordingly.
 export const XRFrameOfReferenceTypes = [
   'viewer',
   'local',
@@ -60,8 +61,8 @@ export default class XRFrameOfReference extends XRCoordinateSystem {
     // and the XRDevice did not provide a transform, this is an invalid
     // configuration and we shouldn't emulate here. XRSession.requestFrameOfReference
     // should check this as well.
-    if (type === 'stage' && options.disableStageEmulation && !transform) {
-      throw new Error(`XRFrameOfReference cannot use 'stage' type, if disabling emulation and platform does not provide`);
+    if (type === 'bounded-floor' && options.disableStageEmulation && !transform) {
+      throw new Error(`XRFrameOfReference cannot use 'bounded-floor' type, if disabling emulation and platform does not provide`);
     }
 
     const { disableStageEmulation, stageEmulationHeight } = options;
@@ -69,13 +70,13 @@ export default class XRFrameOfReference extends XRCoordinateSystem {
     let emulatedHeight = 0;
     // If we're using stage reference and no transform, we're emulating.
     // Set emulated height from option or use the default
-    if (type === 'stage' && !transform) {
+    if (type === 'bounded-floor' && !transform) {
       emulatedHeight = stageEmulationHeight !== 0 ? stageEmulationHeight : DEFAULT_EMULATION_HEIGHT;
     }
 
     // If we're emulating the stage, and the device did not provide
     // a transform, create one here
-    if (type === 'stage' && !transform) {
+    if (type === 'bounded-floor' && !transform) {
       // Apply emulatedHeight to the `y` translation
       transform = mat4.identity(new Float32Array(16));
       transform[13] = emulatedHeight;
@@ -129,18 +130,9 @@ export default class XRFrameOfReference extends XRCoordinateSystem {
     }
 
     switch (this.type) {
-      // For 'head-model' just strip out the translation
-      case 'head-model':
-        if (out !== pose) {
-          mat4.copy(out, pose);
-        }
-
-        out[12] = out[13] = out[14] = 0;
-        return;
-
-      // For 'eye-level', assume the pose given as eye level,
+      // For 'local', assume the pose given as eye level,
       // so no transformation
-      case 'eye-level':
+      case 'local':
         if (out !== pose) {
           mat4.copy(out, pose);
         }
@@ -166,19 +158,8 @@ export default class XRFrameOfReference extends XRCoordinateSystem {
       mat4.invert(out, frameOfRef);
       mat4.multiply(out, view, out);
     }
-    // If we have a head model, invert the view matrix
-    // to strip the translation and invert it back to a
-    // view matrix
-    else if (this.type === 'head-model') {
-      mat4.invert(out, view);
-      out[12] = 0;
-      out[13] = 0;
-      out[14] = 0;
-      mat4.invert(out, out);
-      return out;
-    }
     // Otherwise don't transform the view matrix at all
-    // (like for `eye-level` frame of references.
+    // (like for `local` reference spaces).
     else {
       mat4.copy(out, view);
     }
