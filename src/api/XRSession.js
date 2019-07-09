@@ -300,7 +300,7 @@ export default class XRSession extends EventTarget {
    *
    * @return {Array<XRInputSource>} input sources
    */
-  getInputSources() {
+  get inputSources() {
     return this[PRIVATE].device.getInputSources();
   }
 
