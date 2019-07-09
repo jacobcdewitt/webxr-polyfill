@@ -15,14 +15,6 @@
 
 import EventTarget from '../lib/EventTarget';
 
-export default class XRCoordinateSystem {
+export default class XRSpace {
   constructor() {}
-
-  /**
-   * @param {XRCoordinateSystem} other
-   * @return {Float32Array?}
-   */
-  getTransformTo(other) {
-    throw new Error('Not yet supported');
-  }
 }

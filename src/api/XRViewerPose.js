@@ -58,22 +58,22 @@ export default class XRViewerPose {
   /**
    * NON-STANDARD
    *
-   * @param {XRFrameOfReference} frameOfRef
+   * @param {XRReferenceSpace} refSpace
    */
-  updateFromFrameOfReference(frameOfRef) {
+  updateFromReferenceSpace(refSpace) {
     const pose = this[PRIVATE].device.getBasePoseMatrix();
     const leftViewMatrix = this[PRIVATE].device.getBaseViewMatrix('left');
     const rightViewMatrix = this[PRIVATE].device.getBaseViewMatrix('right');
 
     if (pose) {
-      frameOfRef.transformBasePoseMatrix(this[PRIVATE].poseModelMatrix, pose);
+      refSpace.transformBasePoseMatrix(this[PRIVATE].poseModelMatrix, pose);
     }
 
     if (leftViewMatrix && rightViewMatrix) {
-      frameOfRef.transformBaseViewMatrix(this[PRIVATE].leftViewMatrix,
+      refSpace.transformBaseViewMatrix(this[PRIVATE].leftViewMatrix,
                                          leftViewMatrix,
                                          this[PRIVATE].poseModelMatrix);
-      frameOfRef.transformBaseViewMatrix(this[PRIVATE].rightViewMatrix,
+      refSpace.transformBaseViewMatrix(this[PRIVATE].rightViewMatrix,
                                          rightViewMatrix,
                                          this[PRIVATE].poseModelMatrix);
     }

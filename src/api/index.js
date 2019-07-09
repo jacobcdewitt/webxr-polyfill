@@ -24,8 +24,8 @@ import XRInputSource from './XRInputSource';
 import XRLayer from './XRLayer';
 import XRWebGLLayer from './XRWebGLLayer';
 import XRPresentationContext from './XRPresentationContext';
-import XRCoordinateSystem from './XRCoordinateSystem';
-import XRFrameOfReference from './XRFrameOfReference';
+import XRSpace from './XRSpace';
+import XRReferenceSpace from './XRReferenceSpace';
 import XRStageBounds from './XRStageBounds';
 import XRStageBoundsPoint from './XRStageBoundsPoint';
 import XRRay from './XRRay';
@@ -45,8 +45,8 @@ export default {
   XRLayer,
   XRWebGLLayer,
   XRPresentationContext,
-  XRCoordinateSystem,
-  XRFrameOfReference,
+  XRSpace,
+  XRReferenceSpace,
   XRStageBounds,
   XRStageBoundsPoint,
   XRInputPose,

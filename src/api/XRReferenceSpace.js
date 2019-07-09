@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-import XRCoordinateSystem from './XRCoordinateSystem';
+import XRSpace from './XRSpace';
 import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
 
 const DEFAULT_EMULATION_HEIGHT = 1.6;
 
-export const PRIVATE = Symbol('@@webxr-polyfill/XRFrameOfReference');
+export const PRIVATE = Symbol('@@webxr-polyfill/XRReferenceSpace');
 
 // TODO: Code is handling 'local' and 'bounded-floor' reference space types,
 // but probably needs to check for the other types and make some adjustments
 // accordingly.
-export const XRFrameOfReferenceTypes = [
+export const XRReferenceSpaceTypes = [
   'viewer',
   'local',
   'local-floor',
@@ -31,28 +31,28 @@ export const XRFrameOfReferenceTypes = [
   'unbounded'
 ];
 
-export const XRFrameOfReferenceOptions = Object.freeze({
+export const XRReferenceSpaceOptions = Object.freeze({
   disableStageEmulation: false,
   stageEmulationHeight: 0,
 });
 
-export default class XRFrameOfReference extends XRCoordinateSystem {
+export default class XRReferenceSpace extends XRSpace {
   /**
    * Optionally takes a `transform` from a device's requestFrameOfReferenceMatrix
    * so device's can provide their own transforms for stage (or if they
    * wanted to override eye-level/head-model).
    *
    * @param {XRDevice} device
-   * @param {XRFrameOfReferenceType} type
-   * @param {XRFrameOfReferenceOptions} options
+   * @param {XRReferenceSpaceType} type
+   * @param {XRReferenceSpaceOptions} options
    * @param {Float32Array?} transform
    * @param {?} bounds
    */
   constructor(device, type, options, transform, bounds) {
-    options = Object.assign({}, XRFrameOfReferenceOptions, options);
+    options = Object.assign({}, XRReferenceSpaceOptions, options);
 
-    if (!XRFrameOfReferenceTypes.includes(type)) {
-      throw new Error(`XRFrameOfReferenceType must be one of ${XRFrameOfReferenceTypes}`);
+    if (!XRReferenceSpaceTypes.includes(type)) {
+      throw new Error(`XRReferenceSpaceType must be one of ${XRReferenceSpaceTypes}`);
     }
 
     super();
@@ -62,7 +62,7 @@ export default class XRFrameOfReference extends XRCoordinateSystem {
     // configuration and we shouldn't emulate here. XRSession.requestFrameOfReference
     // should check this as well.
     if (type === 'bounded-floor' && options.disableStageEmulation && !transform) {
-      throw new Error(`XRFrameOfReference cannot use 'bounded-floor' type, if disabling emulation and platform does not provide`);
+      throw new Error(`XRReferenceSpace cannot use 'bounded-floor' type, if disabling emulation and platform does not provide`);
     }
 
     const { disableStageEmulation, stageEmulationHeight } = options;
@@ -107,7 +107,7 @@ export default class XRFrameOfReference extends XRCoordinateSystem {
   /**
    * NON-STANDARD
    *
-   * @return {XRFrameOfReferenceType}
+   * @return {XRReferenceSpaceType}
    */
   get type() { return this[PRIVATE].type; }
 

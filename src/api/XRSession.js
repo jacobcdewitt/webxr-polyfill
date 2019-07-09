@@ -18,10 +18,10 @@ import now from '../lib/now';
 import XRPresentationContext from './XRPresentationContext';
 import XRFrame from './XRFrame';
 import XRStageBounds from './XRStageBounds';
-import XRFrameOfReference, {
-  XRFrameOfReferenceTypes,
-  XRFrameOfReferenceOptions,
-} from './XRFrameOfReference';
+import XRReferenceSpace, {
+  XRReferenceSpaceTypes,
+  XRReferenceSpaceOptions,
+} from './XRReferenceSpace';
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRSession');
 
@@ -198,23 +198,23 @@ export default class XRSession extends EventTarget {
   }
 
   /**
-   * @return {XRFrameOfReference}
+   * @return {XRReferenceSpace}
    */
   async requestReferenceSpace(type, options={}) {
     if (this[PRIVATE].ended) {
       return;
     }
 
-    options = Object.assign({}, XRFrameOfReferenceOptions, options);
+    options = Object.assign({}, XRReferenceSpaceOptions, options);
 
-    if (!XRFrameOfReferenceTypes.includes(type)) {
-      throw new TypeError(`XRFrameOfReferenceType must be one of ${XRFrameOfReferenceTypes}`);
+    if (!XRReferenceSpaceTypes.includes(type)) {
+      throw new TypeError(`XRReferenceSpaceType must be one of ${XRReferenceSpaceTypes}`);
     }
 
     let transform = null;
     let bounds = null;
     // Request a transform from the device given the values. If returning a transform
-    // (probably "stage"), use it, and if undefined, XRFrameOfReference will use a default
+    // (probably "stage"), use it, and if undefined, XRReferenceSpace will use a default
     // transform. This call can throw, rejecting the promise, indicating the device does
     // not support that frame of reference.
     try {
@@ -222,7 +222,7 @@ export default class XRSession extends EventTarget {
     } catch (e) {
       // Check to see if stage frame of reference failed for this
       // XRDevice and we aren't disabling stage emulation.
-      // Don't throw in this case, and let XRFrameOfReference use its
+      // Don't throw in this case, and let XRReferenceSpace use its
       // stage emulation.
       if (type !== 'stage' || options.disableStageEmulation) {
         throw e;
@@ -236,7 +236,7 @@ export default class XRSession extends EventTarget {
       }
     }
 
-    return new XRFrameOfReference(this[PRIVATE].device, type, options, transform, bounds);
+    return new XRReferenceSpace(this[PRIVATE].device, type, options, transform, bounds);
   }
 
   /**

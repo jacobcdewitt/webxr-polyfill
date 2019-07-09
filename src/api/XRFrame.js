@@ -57,20 +57,20 @@ export default class XRFrame {
   get views() { return this[PRIVATE].views; }
 
   /**
-   * @param {XRCoordinateSystem} coordinateSystem
+   * @param {XRSpace} space
    * @return {XRViewerPose?}
    */
-  getViewerPose(coordinateSystem) {
-    this[PRIVATE].viewerPose.updateFromFrameOfReference(coordinateSystem);
+  getViewerPose(space) {
+    this[PRIVATE].viewerPose.updateFromReferenceSpace(space);
     return this[PRIVATE].viewerPose;
   }
 
   /**
    * @param {XRInputSource} inputSource
-   * @param {XRCoordinateSystem} coordinateSystem
+   * @param {XRSpace} space
    * @return {XRInputPose?}
    */
-  getInputPose(inputSource, coordinateSystem) {
-    return this[PRIVATE].device.getInputPose(inputSource, coordinateSystem);
+  getInputPose(inputSource, space) {
+    return this[PRIVATE].device.getInputPose(inputSource, space);
   }
 }
