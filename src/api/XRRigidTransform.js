@@ -36,20 +36,71 @@ export default class XRRigidTransform {
   }
   */
 
-  constructor(matrix, inverse = null) {
-    this[PRIVATE] = {
-      matrix,
-      inverse,
+  // Try to convert arg to a DOMPointReadOnly if it isn't already one.
+  _getPoint(arg) {
+    if (arg instanceof DOMPointReadOnly) {
+      return arg;
     }
 
-    // Decompose matrix into position and orientation.
-    let position = vec3.create();
-    mat4.getTranslation(position, matrix);
-    this[PRIVATE].position = DOMPointReadOnly.fromPoint({x: position[0], y: position[1], z: position[2]});
+    return DOMPointReadOnly.fromPoint(arg);
+  }
 
-    let orientation = quat.create();
-    mat4.getRotation(orientation, matrix);
-    this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({x: orientation[0], y: orientation[1], z: orientation[2], w: orientation[3]});
+  constructor() {
+    this[PRIVATE] = {
+      matrix: null,
+      position: null,
+      orientation: null,
+      inverse: null,
+    };
+
+    if (arguments.length === 0) {
+      this[PRIVATE].matrix = mat4.identity(new Float32Array(16));
+    } else if (arguments.length === 1) {
+      if (arguments[0] instanceof Float32Array) {
+        this[PRIVATE].matrix = arguments[0];
+      } else {
+        this[PRIVATE].position = this._getPoint(arguments[0]);
+        this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({
+            x: 0, y: 0, z: 0, w: 1
+        });
+      }
+    } else if (arguments.length === 2) {
+      this[PRIVATE].position = this._getPoint(arguments[0]);
+      this[PRIVATE].orientation = this._getPoint(arguments[1]);
+      //console.log(this[PRIVATE].position);
+      //console.log(this[PRIVATE].orientation);
+    } else {
+      throw new Error("Too many arguments!");
+    }
+
+    if (this[PRIVATE].matrix) {
+        // Decompose matrix into position and orientation.
+        let position = vec3.create();
+        mat4.getTranslation(position, this[PRIVATE].matrix);
+        this[PRIVATE].position = DOMPointReadOnly.fromPoint({x: position[0], y: position[1], z: position[2]});
+
+        let orientation = quat.create();
+        mat4.getRotation(orientation, this[PRIVATE].matrix);
+        this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({x: orientation[0], y: orientation[1], z: orientation[2], w: orientation[3]});
+    } else {
+        // Compose matrix from position and orientation.
+        // TODO: Might need to invert something here.
+        this[PRIVATE].matrix = mat4.identity(new Float32Array(16));
+        mat4.fromRotationTranslation(
+          this[PRIVATE].matrix,
+          quat.fromValues(
+            this[PRIVATE].orientation.x,
+            this[PRIVATE].orientation.y,
+            this[PRIVATE].orientation.z,
+            this[PRIVATE].orientation.w),
+          vec3.fromValues(
+            this[PRIVATE].position.x,
+            this[PRIVATE].position.y,
+            this[PRIVATE].position.z)
+        );
+    }
+
+    //console.log(this[PRIVATE].matrix);
   }
 
   get matrix() { return this[PRIVATE].matrix; }
@@ -58,15 +109,10 @@ export default class XRRigidTransform {
     if (this[PRIVATE].inverse === null) {
       let invMatrix = mat4.identity(new Float32Array(16));
       mat4.invert(invMatrix, this[PRIVATE].matrix);
-      this[PRIVATE].inverse = new XRRigidTransform(invMatrix, this);
+      this[PRIVATE].inverse = new XRRigidTransform(invMatrix);
+      this[PRIVATE].inverse[PRIVATE].inverse = this;
     }
 
     return this[PRIVATE].inverse;
-  }
-
-  _multiply(otherTransform) {
-    let newMatrix = mat4.identity(new Float32Array(16));
-    mat4.multiply(newMatrix, this[PRIVATE].matrix, otherTransform[PRIVATE].matrix);
-    return new XRRigidTransform(newMatrix, this[PRIVATE].inverse);
   }
 }
