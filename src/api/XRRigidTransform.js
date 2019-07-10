@@ -84,14 +84,14 @@ export default class XRRigidTransform {
         this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({x: orientation[0], y: orientation[1], z: orientation[2], w: orientation[3]});
     } else {
         // Compose matrix from position and orientation.
-        // TODO: Might need to invert something here.
+        // TODO: Why do quaternion x,y,z values need to be negated here?
         this[PRIVATE].matrix = mat4.identity(new Float32Array(16));
         mat4.fromRotationTranslation(
           this[PRIVATE].matrix,
           quat.fromValues(
-            this[PRIVATE].orientation.x,
-            this[PRIVATE].orientation.y,
-            this[PRIVATE].orientation.z,
+            -this[PRIVATE].orientation.x,
+            -this[PRIVATE].orientation.y,
+            -this[PRIVATE].orientation.z,
             this[PRIVATE].orientation.w),
           vec3.fromValues(
             this[PRIVATE].position.x,
