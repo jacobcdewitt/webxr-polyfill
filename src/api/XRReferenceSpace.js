@@ -55,7 +55,7 @@ export default class XRReferenceSpace extends XRSpace {
       throw new Error(`XRReferenceSpaceType must be one of ${XRReferenceSpaceTypes}`);
     }
 
-    super();
+    super((type === 'viewer') ? 'viewer' : null);
 
     // If stage emulation is disabled, and this is a stage frame of reference,
     // and the XRDevice did not provide a transform, this is an invalid
@@ -97,6 +97,8 @@ export default class XRReferenceSpace extends XRSpace {
       options,
     };
     this.onboundschange = undefined;
+    console.log("specialType: " + this._specialType);
+    console.log("specialType2: " + this[PRIVATE].specialType);
   }
 
   _isFloor(type) {

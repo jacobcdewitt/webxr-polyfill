@@ -77,11 +77,21 @@ export default class XRRigidTransform {
         // Decompose matrix into position and orientation.
         let position = vec3.create();
         mat4.getTranslation(position, this[PRIVATE].matrix);
-        this[PRIVATE].position = DOMPointReadOnly.fromPoint({x: position[0], y: position[1], z: position[2]});
+        this[PRIVATE].position = DOMPointReadOnly.fromPoint({
+            x: position[0],
+            y: position[1],
+            z: position[2]
+        });
 
+        // TODO: Why do quaternion x,y,z values need to be negated here?
         let orientation = quat.create();
         mat4.getRotation(orientation, this[PRIVATE].matrix);
-        this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({x: orientation[0], y: orientation[1], z: orientation[2], w: orientation[3]});
+        this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({
+          x: -orientation[0],
+          y: -orientation[1],
+          z: -orientation[2],
+          w: orientation[3]
+        });
     } else {
         // Compose matrix from position and orientation.
         // TODO: Why do quaternion x,y,z values need to be negated here?
@@ -104,6 +114,9 @@ export default class XRRigidTransform {
   }
 
   get matrix() { return this[PRIVATE].matrix; }
+
+  get position() { return this[PRIVATE].position; }
+  get orientation() { return this[PRIVATE].orientation; }
 
   get inverse() {
     if (this[PRIVATE].inverse === null) {

@@ -75,15 +75,28 @@ export default class XRFrame {
   }
 
   getPose(space, baseSpace) {
-    let inputPose = this._getInputPose(space._inputSource, baseSpace);
-    if (!inputPose) {
-      return null;
+    // console.log(space._specialType + " type");
+    if (space._specialType === "viewer") {
+      // Don't just return the viewer pose since the resulting pose shouldn't
+      // include the views array - it should just have the transform.
+      let viewerPose = this.getViewerPose(baseSpace);
+      return new XRPose(
+        new XRRigidTransform(viewerPose.poseModelMatrix),
+        viewerPose.emulatedPosition);
     }
-    if (space._specialType == "target-ray") {
-      return new XRPose(new XRRigidTransform(inputPose.targetRay.matrix), inputPose.emulatedPosition);
-    } else if (space._specialType == "grip") {
-      return new XRPose(new XRRigidTransform(inputPose.gripMatrix), inputPose.emulatedPosition);
+
+    if (space._specialType === "target-ray" || space._specialType === "grip") {
+      let inputPose = this._getInputPose(space._inputSource, baseSpace);
+      if (!inputPose) {
+        return null;
+      }
+      if (space._specialType === "target-ray") {
+        return new XRPose(new XRRigidTransform(inputPose.targetRay.matrix), inputPose.emulatedPosition);
+      } else if (space._specialType === "grip") {
+        return new XRPose(new XRRigidTransform(inputPose.gripMatrix), inputPose.emulatedPosition);
+      }
     }
+
     return null;
   }
 }
