@@ -67,8 +67,6 @@ export default class XRRigidTransform {
     } else if (arguments.length === 2) {
       this[PRIVATE].position = this._getPoint(arguments[0]);
       this[PRIVATE].orientation = this._getPoint(arguments[1]);
-      //console.log(this[PRIVATE].position);
-      //console.log(this[PRIVATE].orientation);
     } else {
       throw new Error("Too many arguments!");
     }
@@ -109,8 +107,6 @@ export default class XRRigidTransform {
             this[PRIVATE].position.z)
         );
     }
-
-    //console.log(this[PRIVATE].matrix);
   }
 
   get matrix() { return this[PRIVATE].matrix; }

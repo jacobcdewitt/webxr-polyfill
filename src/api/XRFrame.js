@@ -75,7 +75,6 @@ export default class XRFrame {
   }
 
   getPose(space, baseSpace) {
-    // console.log(space._specialType + " type");
     if (space._specialType === "viewer") {
       // Don't just return the viewer pose since the resulting pose shouldn't
       // include the views array - it should just have the transform.

@@ -97,8 +97,6 @@ export default class XRReferenceSpace extends XRSpace {
       options,
     };
     this.onboundschange = undefined;
-    console.log("specialType: " + this._specialType);
-    console.log("specialType2: " + this[PRIVATE].specialType);
   }
 
   _isFloor(type) {
