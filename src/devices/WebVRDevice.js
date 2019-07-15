@@ -275,7 +275,11 @@ export default class WebVRDevice extends XRDevice {
       let gamepads = this.global.navigator.getGamepads();
       for (let i = 0; i < gamepads.length; ++i) {
         let gamepad = gamepads[i];
-        if (gamepad && gamepad.displayId === this.display.displayId) {
+        // Supposedly the gamepad's displayId should match the VRDisplay's id,
+        // but in practice anything with a non-zero displayId is an XR
+        // controller, which is almost certainly associated with any VRDisplay
+        // we were able to get.
+        if (gamepad && gamepad.displayId > 0) {
           // Found a gamepad input source for this index.
           let inputSourceImpl = prevInputSources[i];
           if (!inputSourceImpl) {
@@ -578,7 +582,7 @@ export default class WebVRDevice extends XRDevice {
     return inputSources;
   }
 
-  getInputPose(inputSource, coordinateSystem) {
+  getInputPose(inputSource, coordinateSystem, poseType) {
     if (!coordinateSystem) {
       return null;
     }
@@ -586,7 +590,7 @@ export default class WebVRDevice extends XRDevice {
     for (let i in this.gamepadInputSources) {
       let inputSourceImpl = this.gamepadInputSources[i];
       if (inputSourceImpl.inputSource === inputSource) {
-        return inputSourceImpl.getXRInputPose(coordinateSystem);
+        return inputSourceImpl.getXRPose(coordinateSystem, poseType);
       }
     }
     return null;

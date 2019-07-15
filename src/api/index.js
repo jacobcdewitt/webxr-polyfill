@@ -19,7 +19,6 @@ import XRFrame from './XRFrame';
 import XRView from './XRView';
 import XRViewport from './XRViewport';
 import XRViewerPose from './XRViewerPose';
-import XRInputPose from './XRInputPose';
 import XRInputSource from './XRInputSource';
 import XRLayer from './XRLayer';
 import XRWebGLLayer from './XRWebGLLayer';
@@ -50,7 +49,6 @@ export default {
   XRReferenceSpace,
   XRStageBounds,
   XRStageBoundsPoint,
-  XRInputPose,
   XRInputSource,
   XRRay,
   XRRenderState,

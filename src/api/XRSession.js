@@ -295,9 +295,6 @@ export default class XRSession extends EventTarget {
   }
 
   /**
-   * @TODO It's technically OK to return an empty array here, but not really in
-   * the spirit of the API. Should return something based on the gamepad API.
-   *
    * @return {Array<XRInputSource>} input sources
    */
   get inputSources() {

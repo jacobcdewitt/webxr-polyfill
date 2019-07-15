@@ -85,9 +85,9 @@ export default class XRRigidTransform {
         let orientation = quat.create();
         mat4.getRotation(orientation, this[PRIVATE].matrix);
         this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({
-          x: -orientation[0],
-          y: -orientation[1],
-          z: -orientation[2],
+          x: orientation[0],
+          y: orientation[1],
+          z: orientation[2],
           w: orientation[3]
         });
     } else {
@@ -97,9 +97,9 @@ export default class XRRigidTransform {
         mat4.fromRotationTranslation(
           this[PRIVATE].matrix,
           quat.fromValues(
-            -this[PRIVATE].orientation.x,
-            -this[PRIVATE].orientation.y,
-            -this[PRIVATE].orientation.z,
+            this[PRIVATE].orientation.x,
+            this[PRIVATE].orientation.y,
+            this[PRIVATE].orientation.z,
             this[PRIVATE].orientation.w),
           vec3.fromValues(
             this[PRIVATE].position.x,

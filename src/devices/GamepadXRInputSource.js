@@ -13,12 +13,10 @@
  * limitations under the License.
  */
 
-import XRInputPose from '../api/XRInputPose';
 import XRInputSource from '../api/XRInputSource';
 import OrientationArmModel from '../lib/OrientationArmModel';
 import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
 import * as vec3 from 'gl-matrix/src/gl-matrix/vec3';
-import { poseMatrixToXRRay } from '../utils';
 
 export default class GamepadXRInputSource {
   constructor(polyfill, primaryButtonIndex = 0) {
@@ -28,6 +26,7 @@ export default class GamepadXRInputSource {
     this.lastPosition = vec3.create();
     this.emulatedPosition = false;
     this.basePoseMatrix = mat4.create();
+    this.outputMatrix = mat4.create();
     this.inputPoses = new WeakMap(); // Map of XRCoordinateSystem:XRInputPose
     this.primaryButtonIndex = primaryButtonIndex;
     this.primaryActionPressed = false;
@@ -84,23 +83,25 @@ export default class GamepadXRInputSource {
     return this.basePoseMatrix;
   }
 
-  getXRInputPose(coordinateSystem) {
+  getXRPose(coordinateSystem, poseType) {
     this.updateBasePoseMatrix();
-    let inputPose = this.inputPoses.get(coordinateSystem);
-    if (!inputPose) {
-      inputPose = new XRInputPose(this, this.gamepad && this.gamepad.pose);
-      this.inputPoses.set(coordinateSystem, inputPose);
+
+    switch(poseType) {
+      case "target-ray":
+        // TODO: Does the target ray matrix need to be tweaked?
+        coordinateSystem.transformBasePoseMatrix(this.outputMatrix, this.basePoseMatrix);
+        break;
+      case "grip":
+        if (!this.gamepad || !this.gamepad.pose) {
+          return null;
+        }
+        // TODO: Does the grip matrix need to be tweaked?
+        coordinateSystem.transformBasePoseMatrix(this.outputMatrix, this.basePoseMatrix);
+        break;
+      default:
+        return null;
     }
 
-    const rayTransformMatrix = new Float32Array(16);
-    // TODO: The pointer matrix should probably be tweaked a bit.
-    coordinateSystem.transformBasePoseMatrix(rayTransformMatrix, this.basePoseMatrix);
-
-    inputPose.targetRay = poseMatrixToXRRay(rayTransformMatrix);
-
-    if (inputPose.gripMatrix) {
-      coordinateSystem.transformBasePoseMatrix(inputPose.gripMatrix, this.basePoseMatrix);
-    }
-    return inputPose;
+    return new XRPose(new XRRigidTransform(this.outputMatrix), this.emulatedPosition);
   }
 }
