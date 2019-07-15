@@ -13,14 +13,130 @@
  * limitations under the License.
  */
 
+import GamepadMappings from './GamepadMappings';
 import XRInputSource from '../api/XRInputSource';
 import OrientationArmModel from '../lib/OrientationArmModel';
 import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
 import * as vec3 from 'gl-matrix/src/gl-matrix/vec3';
+import * as quat from 'gl-matrix/src/gl-matrix/quat';
+
+export const PRIVATE = Symbol('@@webxr-polyfill/XRRemappedGamepad');
+
+const PLACEHOLDER_BUTTON = { pressed: false, touched: false, value: 0.0 };
+Object.freeze(PLACEHOLDER_BUTTON);
+
+class XRRemappedGamepad {
+  constructor(gamepad, map) {
+    if (!map) {
+      map = {};
+    }
+
+    let axes = map.axes ? new Array(map.axes.length || gamepad.axes.length) : gamepad.axes;
+    let buttons = map.buttons ? new Array(map.buttons.length || gamepad.buttons.length) : gamepad.buttons;
+
+    let gripTransform = null;
+    if (map.gripTransform) {
+      let orientation = map.gripTransform.orientation || [0, 0, 0, 1];
+      gripTransform = mat4.create();
+      mat4.fromRotationTranslation(
+        gripTransform,
+        quat.normalize(orientation, orientation),
+        map.gripTransform.position || [0, 0, 0]
+      );
+    }
+
+    let targetRayTransform = null;
+    if (map.targetRayTransform) {
+      let orientation =  map.targetRayTransform.orientation || [0, 0, 0, 1];
+      targetRayTransform = mat4.create();
+      mat4.fromRotationTranslation(
+        targetRayTransform,
+        quat.normalize(orientation, orientation),
+        map.targetRayTransform.position || [0, 0, 0]
+      );
+    }
+
+    this[PRIVATE] = {
+      gamepad,
+      map,
+      mapping: map.mapping || gamepad.mapping,
+      axes,
+      buttons,
+      gripTransform,
+      targetRayTransform,
+    };
+
+    this._update();
+  }
+
+  _update() {
+    let gamepad = this[PRIVATE].gamepad;
+    let map = this[PRIVATE].map;
+
+    if (map.axes) {
+      let axes = this[PRIVATE].axes;
+      for (let i = 0; i < axes.length; ++i) {
+        if (i in map.axes) {
+          if (map.axes[i] === null) {
+            axes[i] = 0;
+          } else {
+            axes[i] = gamepad.axes[map.axes[i]];
+          }
+        } else {
+          axes[i] = gamepad.axes[i];
+        }
+      }
+    }
+
+    if (map.buttons) {
+      let buttons = this[PRIVATE].buttons;
+      for (let i = 0; i < buttons.length; ++i) {
+        if (i in map.buttons) {
+          if (map.buttons[i] === null) {
+            buttons[i] = PLACEHOLDER_BUTTON;
+          } else {
+            buttons[i] = gamepad.buttons[map.buttons[i]];
+          }
+        } else {
+          buttons[i] = gamepad.buttons[i];
+        }
+      }
+    }
+  }
+
+  get id() {
+    return '';
+  }
+
+  get index() {
+    return -1;
+  }
+
+  get connected() {
+    return this[PRIVATE].gamepad.connected;
+  }
+
+  get timestamp() {
+    return this[PRIVATE].gamepad.timestamp;
+  }
+
+  get mapping() {
+    return this[PRIVATE].mapping;
+  }
+
+  get axes() {
+    return this[PRIVATE].axes;
+  }
+
+  get buttons() {
+    return this[PRIVATE].buttons;
+  }
+}
 
 export default class GamepadXRInputSource {
   constructor(polyfill, primaryButtonIndex = 0) {
     this.polyfill = polyfill;
+    this.nativeGamepad = null;
     this.gamepad = null;
     this.inputSource = new XRInputSource(this);
     this.lastPosition = vec3.create();
@@ -36,8 +152,19 @@ export default class GamepadXRInputSource {
   }
 
   updateFromGamepad(gamepad) {
-    this.gamepad = gamepad;
+    if (this.nativeGamepad !== gamepad) {
+      this.nativeGamepad = gamepad;
+      if (gamepad) {
+        this.gamepad = new XRRemappedGamepad(gamepad, GamepadMappings[gamepad.id]);
+      } else {
+        this.gamepad = null;
+      }
+    }
     this.handedness = gamepad.hand;
+
+    if (this.gamepad) {
+      this.gamepad._update();
+    }
 
     if (gamepad.pose) {
       this.targetRayMode = 'tracked-pointer';
@@ -49,8 +176,8 @@ export default class GamepadXRInputSource {
   }
 
   updateBasePoseMatrix() {
-    if (this.gamepad && this.gamepad.pose) {
-      let pose = this.gamepad.pose;
+    if (this.nativeGamepad && this.nativeGamepad.pose) {
+      let pose = this.nativeGamepad.pose;
       let position = pose.position;
       let orientation = pose.orientation;
       // On initialization, we might not have any values
@@ -63,7 +190,7 @@ export default class GamepadXRInputSource {
             this.armModel = new OrientationArmModel();
           }
 
-          this.armModel.setHandedness(this.gamepad.hand);
+          this.armModel.setHandedness(this.nativeGamepad.hand);
           this.armModel.update(orientation, this.polyfill.getBasePoseMatrix());
           position = this.armModel.getPosition();
         } else {
@@ -88,15 +215,20 @@ export default class GamepadXRInputSource {
 
     switch(poseType) {
       case "target-ray":
-        // TODO: Does the target ray matrix need to be tweaked?
         coordinateSystem.transformBasePoseMatrix(this.outputMatrix, this.basePoseMatrix);
+        if (this.gamepad && this.gamepad[PRIVATE].targetRayTransform) {
+          mat4.multiply(this.outputMatrix, this.outputMatrix, this.gamepad[PRIVATE].targetRayTransform);
+        }
         break;
       case "grip":
-        if (!this.gamepad || !this.gamepad.pose) {
+        if (!this.nativeGamepad || !this.nativeGamepad.pose) {
           return null;
         }
         // TODO: Does the grip matrix need to be tweaked?
         coordinateSystem.transformBasePoseMatrix(this.outputMatrix, this.basePoseMatrix);
+        if (this.gamepad && this.gamepad[PRIVATE].gripTransform) {
+          mat4.multiply(this.outputMatrix, this.outputMatrix, this.gamepad[PRIVATE].gripTransform);
+        }
         break;
       default:
         return null;
