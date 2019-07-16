@@ -31,8 +31,8 @@ class XRRemappedGamepad {
       map = {};
     }
 
-    let axes = map.axes ? new Array(map.axes.length || gamepad.axes.length) : gamepad.axes;
-    let buttons = map.buttons ? new Array(map.buttons.length || gamepad.buttons.length) : gamepad.buttons;
+    let axes = new Array(map.axes ? map.axes.length : gamepad.axes.length);
+    let buttons = new Array(map.buttons ? map.buttons.length : gamepad.buttons.length);
 
     let gripTransform = null;
     if (map.gripTransform) {
@@ -73,33 +73,29 @@ class XRRemappedGamepad {
     let gamepad = this[PRIVATE].gamepad;
     let map = this[PRIVATE].map;
 
-    if (map.axes) {
-      let axes = this[PRIVATE].axes;
-      for (let i = 0; i < axes.length; ++i) {
-        if (i in map.axes) {
-          if (map.axes[i] === null) {
-            axes[i] = 0;
-          } else {
-            axes[i] = gamepad.axes[map.axes[i]];
-          }
+    let axes = this[PRIVATE].axes;
+    for (let i = 0; i < axes.length; ++i) {
+      if (map.axes && i in map.axes) {
+        if (map.axes[i] === null) {
+          axes[i] = 0;
         } else {
-          axes[i] = gamepad.axes[i];
+          axes[i] = gamepad.axes[map.axes[i]];
         }
+      } else {
+        axes[i] = gamepad.axes[i];
       }
     }
 
-    if (map.buttons) {
-      let buttons = this[PRIVATE].buttons;
-      for (let i = 0; i < buttons.length; ++i) {
-        if (i in map.buttons) {
-          if (map.buttons[i] === null) {
-            buttons[i] = PLACEHOLDER_BUTTON;
-          } else {
-            buttons[i] = gamepad.buttons[map.buttons[i]];
-          }
+    let buttons = this[PRIVATE].buttons;
+    for (let i = 0; i < buttons.length; ++i) {
+      if (map.buttons && i in map.buttons) {
+        if (map.buttons[i] === null) {
+          buttons[i] = PLACEHOLDER_BUTTON;
         } else {
-          buttons[i] = gamepad.buttons[i];
+          buttons[i] = gamepad.buttons[map.buttons[i]];
         }
+      } else {
+        buttons[i] = gamepad.buttons[i];
       }
     }
   }

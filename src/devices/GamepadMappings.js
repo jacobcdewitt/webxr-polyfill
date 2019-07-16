@@ -67,6 +67,20 @@ let oculusTouch = {
 let GamepadMappings = {
   "Oculus Touch (Right)": oculusTouch,
   "Oculus Touch (Left)": oculusTouch,
+
+  "Oculus Go Controller": {
+    mapping: 'xr-standard',
+    buttons: {
+      length: 3,
+      0: 1,
+      1: null,
+      2: 0
+    },
+    // Grip adjustments determined experimentally.
+    gripTransform: {
+      orientation: [Math.PI * 0.11, 0, 0, 1]
+    }
+  }
 };
 
 export default GamepadMappings;
