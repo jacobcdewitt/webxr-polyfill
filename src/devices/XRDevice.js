@@ -64,6 +64,14 @@ export default class XRDevice extends EventTarget {
   onBaseLayerSet(sessionId, layer) { throw new Error('Not implemented'); }
 
   /**
+   * Called when a XRSession has an `inlineVerticalFieldOfView` property set.
+   *
+   * @param {number} sessionId
+   * @param {float} value
+   */
+  onInlineVerticalFieldOfViewSet(sessionId, value) { throw new Error('Not implemented'); }
+
+  /**
    * @param {XRSessionMode} mode
    * @return {boolean}
    */

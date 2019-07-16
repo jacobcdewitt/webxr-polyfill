@@ -81,7 +81,6 @@ export default class XRRigidTransform {
             z: position[2]
         });
 
-        // TODO: Why do quaternion x,y,z values need to be negated here?
         let orientation = quat.create();
         mat4.getRotation(orientation, this[PRIVATE].matrix);
         this[PRIVATE].orientation = DOMPointReadOnly.fromPoint({
@@ -97,9 +96,9 @@ export default class XRRigidTransform {
         mat4.fromRotationTranslation(
           this[PRIVATE].matrix,
           quat.fromValues(
-            this[PRIVATE].orientation.x,
-            this[PRIVATE].orientation.y,
-            this[PRIVATE].orientation.z,
+            -this[PRIVATE].orientation.x,
+            -this[PRIVATE].orientation.y,
+            -this[PRIVATE].orientation.z,
             this[PRIVATE].orientation.w),
           vec3.fromValues(
             this[PRIVATE].position.x,
