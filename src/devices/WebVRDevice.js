@@ -55,6 +55,7 @@ class Session {
     this.immersive = mode == 'immersive-vr' || mode == 'immersive-ar';
     this.ended = null;
     this.baseLayer = null;
+    this.inlineVerticalFieldOfView = Math.PI * 0.5;
     this.id = ++SESSION_ID;
     // A flag indicating whether or not the canvas used for
     // XRWebGLLayer was injected into the DOM to work around
@@ -162,9 +163,14 @@ export default class WebVRDevice extends XRDevice {
     }
     // If a non-immersive session that has an outputContext
     // we only have a magic window.
-    else if (session.outputContext) {
+    else {
       session.baseLayer = layer;
     }
+  }
+
+  onInlineVerticalFieldOfViewSet(sessionId, value) {
+    const session = this.sessions.get(sessionId);
+    session.inlineVerticalFieldOfView = value;
   }
 
   /**
@@ -275,7 +281,11 @@ export default class WebVRDevice extends XRDevice {
       let gamepads = this.global.navigator.getGamepads();
       for (let i = 0; i < gamepads.length; ++i) {
         let gamepad = gamepads[i];
-        if (gamepad && gamepad.displayId === this.display.displayId) {
+        // Supposedly the gamepad's displayId should match the VRDisplay's id,
+        // but in practice anything with a non-zero displayId is an XR
+        // controller, which is almost certainly associated with any VRDisplay
+        // we were able to get.
+        if (gamepad && gamepad.displayId > 0) {
           // Found a gamepad input source for this index.
           let inputSourceImpl = prevInputSources[i];
           if (!inputSourceImpl) {
@@ -308,31 +318,11 @@ export default class WebVRDevice extends XRDevice {
     // If the session has an outputContext for magic window and there's not an
     // active immersive session using the same canvas, make sure the underlying
     // WebGL canvas is sized to match the output canvas.
-    if (session.outputContext && !session.immersive) {
-      const outputCanvas = session.outputContext.canvas;
-      const oWidth = outputCanvas.offsetWidth;
-      const oHeight = outputCanvas.offsetHeight;
-      if (outputCanvas.width != oWidth) {
-        outputCanvas.width = oWidth;
-      }
-      if (outputCanvas.height != oHeight) {
-        outputCanvas.height = oHeight;
-      }
-
+    if (!session.immersive && session.baseLayer) {
       const canvas = session.baseLayer.context.canvas;
-      if (!this.immersiveSession ||
-          canvas !== this.immersiveSession.baseLayer.context.canvas) {
-        if (canvas.width != oWidth) {
-          canvas.width = oWidth;
-        }
-        if (canvas.height != oHeight) {
-          canvas.height = oHeight;
-        }
-
-        // Update the projection matrix.
-        mat4.perspective(this.frame.leftProjectionMatrix, Math.PI * 0.4,
-                         oWidth/oHeight, this.depthNear, this.depthFar);
-      }
+      // Update the projection matrix.
+      mat4.perspective(this.frame.leftProjectionMatrix, session.inlineVerticalFieldOfView,
+          canvas.width/canvas.height, this.depthNear, this.depthFar);
     }
   }
 
@@ -486,6 +476,8 @@ export default class WebVRDevice extends XRDevice {
       return this.frame.leftProjectionMatrix;
     } else if (eye === 'right') {
       return this.frame.rightProjectionMatrix;
+    } else if (eye === 'none') {
+      return this.frame.leftProjectionMatrix;
     } else {
       throw new Error(`eye must be of type 'left' or 'right'`);
     }
@@ -578,7 +570,7 @@ export default class WebVRDevice extends XRDevice {
     return inputSources;
   }
 
-  getInputPose(inputSource, coordinateSystem) {
+  getInputPose(inputSource, coordinateSystem, poseType) {
     if (!coordinateSystem) {
       return null;
     }
@@ -586,7 +578,7 @@ export default class WebVRDevice extends XRDevice {
     for (let i in this.gamepadInputSources) {
       let inputSourceImpl = this.gamepadInputSources[i];
       if (inputSourceImpl.inputSource === inputSource) {
-        return inputSourceImpl.getXRInputPose(coordinateSystem);
+        return inputSourceImpl.getXRPose(coordinateSystem, poseType);
       }
     }
     return null;

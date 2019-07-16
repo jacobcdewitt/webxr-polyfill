@@ -270,12 +270,18 @@ export default class XRSession extends EventTarget {
         // Apply pending render state.
         this[PRIVATE].activeRenderState = this[PRIVATE].pendingRenderState;
         this[PRIVATE].pendingRenderState = null;
-        // TODO: clamp inlineVerticalFieldOfView to range
+
         // TODO: set compositionDisabled
 
         // Report to the device since it'll need
         // to handle the layer for rendering
-        this[PRIVATE].device.onBaseLayerSet(this[PRIVATE].id, this[PRIVATE].activeRenderState.baseLayer);
+        if (this[PRIVATE].activeRenderState.baseLayer) {
+          this[PRIVATE].device.onBaseLayerSet(this[PRIVATE].id, this[PRIVATE].activeRenderState.baseLayer);
+        }
+
+        if (this[PRIVATE].activeRenderState.inlineVerticalFieldOfView) {
+          this[PRIVATE].device.onInlineVerticalFieldOfViewSet(this[PRIVATE].id, this[PRIVATE].activeRenderState.inlineVerticalFieldOfView);
+        }
       }
       this[PRIVATE].device.onFrameStart(this[PRIVATE].id);
       callback(now(), this[PRIVATE].frame);
@@ -295,9 +301,6 @@ export default class XRSession extends EventTarget {
   }
 
   /**
-   * @TODO It's technically OK to return an empty array here, but not really in
-   * the spirit of the API. Should return something based on the gamepad API.
-   *
    * @return {Array<XRInputSource>} input sources
    */
   get inputSources() {
@@ -347,11 +350,16 @@ export default class XRSession extends EventTarget {
     const fovSet = (newState.inlineVerticalFieldOfView !== null) &&
                    (newState.inlineVerticalFieldOfView !== undefined);
 
-    if (this[PRIVATE].immersive && fovSet) {
-      const message = "inlineVerticalFieldOfView must not be set for an " +
-                      "XRRenderState passed to updateRenderState for an " +
-                      "immersive session.";
-      throw new Error(message);
+    if (fovSet) {
+      if (this[PRIVATE].immersive) {
+        const message = "inlineVerticalFieldOfView must not be set for an " +
+                        "XRRenderState passed to updateRenderState for an " +
+                        "immersive session.";
+        throw new Error(message);
+      } else {
+        // Clamp the inline FoV to a sane range.
+        newState.inlineVerticalFieldOfView = Math.min(3.13, Math.max(0.01, newState.inlineVerticalFieldOfView));
+      }
     }
 
     if (this[PRIVATE].pendingRenderState === null) {
