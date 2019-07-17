@@ -15,7 +15,6 @@
 
 import EventTarget from '../lib/EventTarget';
 import now from '../lib/now';
-import XRPresentationContext from './XRPresentationContext';
 import XRFrame from './XRFrame';
 import XRStageBounds from './XRStageBounds';
 import XRReferenceSpace, {
@@ -84,7 +83,6 @@ export default class XRSession extends EventTarget {
     };
     device.addEventListener('@@webxr-polyfill/vr-present-end', this[PRIVATE].onPresentationEnd);
 
-
     // Hook into the XRDisplay's `vr-present-start` event so we can
     // suspend if another session has begun immersive presentation.
     this[PRIVATE].onPresentationStart = sessionId => {
@@ -139,6 +137,9 @@ export default class XRSession extends EventTarget {
     this.onselectend = undefined;
   }
 
+  /**
+   * @return {XRRenderState}
+   */
   get renderState() { return this[PRIVATE].activeRenderState; }
 
   /**
@@ -198,6 +199,8 @@ export default class XRSession extends EventTarget {
   }
 
   /**
+   * @param {string} type
+   * @param {Object?} options
    * @return {XRReferenceSpace}
    */
   async requestReferenceSpace(type, options={}) {
@@ -273,14 +276,17 @@ export default class XRSession extends EventTarget {
 
         // TODO: set compositionDisabled
 
-        // Report to the device since it'll need
-        // to handle the layer for rendering
+        // Report to the device since it'll need to handle the layer for rendering.
         if (this[PRIVATE].activeRenderState.baseLayer) {
-          this[PRIVATE].device.onBaseLayerSet(this[PRIVATE].id, this[PRIVATE].activeRenderState.baseLayer);
+          this[PRIVATE].device.onBaseLayerSet(
+            this[PRIVATE].id,
+            this[PRIVATE].activeRenderState.baseLayer);
         }
 
         if (this[PRIVATE].activeRenderState.inlineVerticalFieldOfView) {
-          this[PRIVATE].device.onInlineVerticalFieldOfViewSet(this[PRIVATE].id, this[PRIVATE].activeRenderState.inlineVerticalFieldOfView);
+          this[PRIVATE].device.onInlineVerticalFieldOfViewSet(
+            this[PRIVATE].id,
+            this[PRIVATE].activeRenderState.inlineVerticalFieldOfView);
         }
       }
       this[PRIVATE].device.onFrameStart(this[PRIVATE].id);
@@ -307,6 +313,9 @@ export default class XRSession extends EventTarget {
     return this[PRIVATE].device.getInputSources();
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   async end() {
     if (this[PRIVATE].ended) {
       return;
@@ -331,9 +340,12 @@ export default class XRSession extends EventTarget {
     return this[PRIVATE].device.endSession(this[PRIVATE].id);
   }
 
-  // The updateRenderState() method queues an update to the active render state
-  // to be applied on the next frame. Unset fields of the XRRenderStateInit
-  // passed to this method will not be changed.
+  /**
+   * Queues an update to the active render state to be applied on the next
+   * frame. Unset fields of newState will not be changed.
+   * 
+   * @param {XRRenderStateInit?} newState 
+   */
   updateRenderState(newState) {
     if (this[PRIVATE].ended) {
       const message = "Can't call updateRenderState on an XRSession " +
@@ -341,7 +353,7 @@ export default class XRSession extends EventTarget {
       throw new Error(message);
     }
 
-    if (newState.baseLayer && (newState.baseLayer.session !== this)) {
+    if (newState.baseLayer && (newState.baseLayer._session !== this)) {
       const message = "Called updateRenderState with a base layer that was " +
                       "created by a different session.";
       throw new Error(message);
@@ -358,13 +370,15 @@ export default class XRSession extends EventTarget {
         throw new Error(message);
       } else {
         // Clamp the inline FoV to a sane range.
-        newState.inlineVerticalFieldOfView = Math.min(3.13, Math.max(0.01, newState.inlineVerticalFieldOfView));
+        newState.inlineVerticalFieldOfView = Math.min(
+          3.13, Math.max(0.01, newState.inlineVerticalFieldOfView));
       }
     }
 
     if (this[PRIVATE].pendingRenderState === null) {
       // Clone pendingRenderState and override any fields that are set by newState.
-      this[PRIVATE].pendingRenderState = Object.assign({}, this[PRIVATE].activeRenderState, newState);
+      this[PRIVATE].pendingRenderState = Object.assign(
+        {}, this[PRIVATE].activeRenderState, newState);
     }
   }
 }

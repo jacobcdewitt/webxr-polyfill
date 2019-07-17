@@ -99,6 +99,10 @@ export default class XRReferenceSpace extends XRSpace {
     this.onboundschange = undefined;
   }
 
+  /**
+   * @param {string} type 
+   * @return {boolean}
+   */
   _isFloor(type) {
     return type === 'bounded-floor' || type === 'local-floor';
   }
@@ -186,7 +190,7 @@ export default class XRReferenceSpace extends XRSpace {
       this[PRIVATE].device,
       this[PRIVATE].type,
       this[PRIVATE].options,
-      this[PRIVATE].transform, // Will be replace with a new transform.
+      this[PRIVATE].transform, // Will be replaced with a new transform.
       this[PRIVATE].bounds);
 
     // TODO: Might need to invert something here.

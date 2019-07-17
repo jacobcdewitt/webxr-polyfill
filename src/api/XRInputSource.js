@@ -21,9 +21,7 @@ export const PRIVATE = Symbol('@@webxr-polyfill/XRInputSource');
 
 export default class XRInputSource {
   /**
-   * @param {XRHandedness} handedness
-   * @param {XRTargetRayMode} targetRayMode
-   * @param {number} sessionId
+   * @param {GamepadXRInputSource} impl 
    */
   constructor(impl) {
     this[PRIVATE] = {

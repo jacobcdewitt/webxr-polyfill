@@ -24,13 +24,31 @@ export const XRRenderStateInit = Object.freeze({
 
 // TODO: inlineVerticalFieldOfView must be PI * 0.5 for non-immersive sessions.
 export default class XRRenderState {
+  /**
+   * @param {Object?} stateInit 
+   */
   constructor(stateInit = {}) {
     const config = Object.assign({}, XRRenderStateInit, stateInit);
     this[PRIVATE] = { config };
   }
 
+  /**
+   * @return {number}
+   */
   get depthNear() { return this[PRIVATE].depthNear; }
+
+  /**
+   * @return {number}
+   */
   get depthFar() { return this[PRIVATE].depthFar; }
+
+  /**
+   * @return {number?}
+   */
   get inlineVerticalFieldOfView() { return this[PRIVATE].inlineVerticalFieldOfView; }
+
+  /**
+   * @return {XRWebGLLayer}
+   */
   get baseLayer() { return this[PRIVATE].baseLayer; }
 }

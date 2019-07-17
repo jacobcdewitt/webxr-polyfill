@@ -59,8 +59,14 @@ export default class XRView {
    */
   get projectionMatrix() { return this[PRIVATE].device.getProjectionMatrix(this.eye); }
 
+  /**
+   * @return {XRRigidTransform}
+   */
   get transform() { return this[PRIVATE].transform; }
 
+  /**
+   * @param {mat4} viewMatrix 
+   */
   _updateViewMatrix(viewMatrix) {
     let invMatrix = mat4.identity(new Float32Array(16));
     mat4.invert(invMatrix, viewMatrix);

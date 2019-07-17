@@ -33,6 +33,11 @@ export const XRWebGLLayerInit = Object.freeze({
 });
 
 export default class XRWebGLLayer extends XRLayer {
+  /**
+   * @param {XRSession} session 
+   * @param {XRWebGLRenderingContext} context 
+   * @param {Object?} layerInit 
+   */
   constructor(session, context, layerInit={}) {
     const config = Object.assign({}, XRWebGLLayerInit, layerInit);
 
@@ -97,6 +102,8 @@ export default class XRWebGLLayer extends XRLayer {
    */
   get framebufferHeight() { return this[PRIVATE].context.drawingBufferHeight; }
 
-  // Only used internally.
-  get session() { return this[PRIVATE].session; }
+  /**
+   * @return {XRSession}
+   */
+  get _session() { return this[PRIVATE].session; }
 }

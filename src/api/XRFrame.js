@@ -65,6 +65,11 @@ export default class XRFrame {
     return this[PRIVATE].viewerPose;
   }
 
+  /**
+   * @param {XRSpace} space
+   * @param {XRSpace} baseSpace
+   * @return {XRPose?} pose
+   */
   getPose(space, baseSpace) {
     if (space._specialType === "viewer") {
       // Don't just return the viewer pose since the resulting pose shouldn't
@@ -76,7 +81,8 @@ export default class XRFrame {
     }
 
     if (space._specialType === "target-ray" || space._specialType === "grip") {
-      return this[PRIVATE].device.getInputPose(space._inputSource, baseSpace, space._specialType);
+      return this[PRIVATE].device.getInputPose(
+        space._inputSource, baseSpace, space._specialType);
     }
 
     return null;

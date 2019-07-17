@@ -19,32 +19,12 @@ import * as quat from 'gl-matrix/src/gl-matrix/quat';
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRRigidTransform');
 
-// TODO: Decompose matrix into position and orientation.
-// TODO: Implement constructor that takes position and orientation instead of a matrix.
 export default class XRRigidTransform {
-  /*
-  constructor(position = null, orientation = null) {
-    if (!position) {
-      position = [0, 0, 0, 1];
-    }
-
-    if (!orientation) {
-      orientation = [0, 0, 0, 1];
-    }
-
-    // TODO: Compose matrix from position and orientation.
-  }
-  */
-
-  // Try to convert arg to a DOMPointReadOnly if it isn't already one.
-  _getPoint(arg) {
-    if (arg instanceof DOMPointReadOnly) {
-      return arg;
-    }
-
-    return DOMPointReadOnly.fromPoint(arg);
-  }
-
+  // no arguments: identity transform
+  // (Float32Array): transform based on matrix
+  // (DOMPointReadOnly): transform based on position without any rotation
+  // (DOMPointReadOnly, DOMPointReadOnly): transform based on position and
+  // orientation quaternion
   constructor() {
     this[PRIVATE] = {
       matrix: null,
@@ -108,11 +88,37 @@ export default class XRRigidTransform {
     }
   }
 
+  /**
+   * Try to convert arg to a DOMPointReadOnly if it isn't already one.
+   * @param {*} arg
+   * @return {DOMPointReadOnly}
+   */
+  _getPoint(arg) {
+    if (arg instanceof DOMPointReadOnly) {
+      return arg;
+    }
+
+    return DOMPointReadOnly.fromPoint(arg);
+  }
+
+  /**
+   * @return {Float32Array}
+   */
   get matrix() { return this[PRIVATE].matrix; }
 
+  /**
+   * @return {DOMPointReadOnly}
+   */
   get position() { return this[PRIVATE].position; }
+
+  /**
+   * @return {DOMPointReadOnly}
+   */
   get orientation() { return this[PRIVATE].orientation; }
 
+  /**
+   * @return {XRRigidTransform}
+   */
   get inverse() {
     if (this[PRIVATE].inverse === null) {
       let invMatrix = mat4.identity(new Float32Array(16));

@@ -17,16 +17,16 @@ export default class XRLayer {
   constructor() {}
 
   /**
-   * @TODO No mention in spec on not reusing the XRViewport
-   * on every frame
+   * @TODO No mention in spec on not reusing the XRViewport on every frame.
+   * 
+   * @TODO In the future maybe all this logic should be handled by the XRLayer?
+   * It's a bit difficult as this is one of the few classes directly
+   * instantiated by content rather.
    *
    * @param {XRView} view
    * @return {XRViewport?}
    */
   getViewport(view) {
-    // TODO In the future maybe all this logic should be handled
-    // by the XRLayer? It's a bit difficult as this is one of the few
-    // classes directly instantiated by content rather.
     return view._getViewport(this);
   }
 }

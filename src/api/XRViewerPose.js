@@ -38,7 +38,7 @@ export default class XRViewerPose {
 
   /**
    * @param {XRView} view
-   * @return Float32Array
+   * @return {Float32Array}
    */
   getViewMatrix(view) {
     switch (view.eye) {
@@ -48,6 +48,9 @@ export default class XRViewerPose {
     throw new Error(`view is not a valid XREye`);
   }
 
+  /**
+   * @return {Array<XRView>}
+   */
   get views() {
     return this[PRIVATE].views;
   }

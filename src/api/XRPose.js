@@ -16,6 +16,10 @@
 export const PRIVATE = Symbol('@@webxr-polyfill/XRPose');
 
 export default class XRPose {
+  /**
+   * @param {XRRigidTransform} transform 
+   * @param {boolean} emulatedPosition 
+   */
   constructor(transform, emulatedPosition) {
     this[PRIVATE] = {
       transform,
@@ -23,6 +27,13 @@ export default class XRPose {
     };
   }
 
+  /**
+   * @return {XRRigidTransform}
+   */
   get transform() { return this[PRIVATE].transform; }
+
+  /**
+   * @return {bool}
+   */
   get emulatedPosition() { return this[PRIVATE].emulatedPosition; }
 }

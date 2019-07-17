@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-import EventTarget from '../lib/EventTarget';
-
 export const PRIVATE = Symbol('@@webxr-polyfill/XRSpace');
 
 export default class XRSpace {
+  /**
+   * @param {string?} specialType 
+   * @param {XRInputSource?} inputSource 
+   */
   constructor(specialType = null, inputSource = null) {
     this[PRIVATE] = {
       specialType,
@@ -25,10 +27,16 @@ export default class XRSpace {
     };
   }
 
+  /**
+   * @return {string?}
+   */
   get _specialType() {
     return this[PRIVATE].specialType;
   }
 
+  /**
+   * @return {XRInputSource?}
+   */
   get _inputSource() {
     return this[PRIVATE].inputSource;
   }
