@@ -59,6 +59,7 @@ class XRRemappedGamepad {
     this[PRIVATE] = {
       gamepad,
       map,
+      id: map.id || gamepad.id,
       mapping: map.mapping || gamepad.mapping,
       axes,
       buttons,
@@ -101,11 +102,13 @@ class XRRemappedGamepad {
   }
 
   get id() {
-    return '';
+    // Chrome 76 Diff: Spec indicated this must be ''
+    return this[PRIVATE].id;
   }
 
   get index() {
-    return -1;
+    // Chrome 76 Diff: Spec indicated this must be -1
+    return 0; 
   }
 
   get connected() {
