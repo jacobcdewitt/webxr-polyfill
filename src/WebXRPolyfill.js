@@ -87,19 +87,14 @@ export default class WebXRPolyfill {
       const polyfilledCtx = polyfillMakeXRCompatible(global.WebGLRenderingContext);
 
       // If we polyfilled `makeXRCompatible`, also polyfill the context creation
-      // parameter `{ xrCompatible }`. Also assume that we need to polyfill
-      // `ctx.getContext('xrpresent')`
+      // parameter `{ xrCompatible }`.
       if (polyfilledCtx) {
-        // Use ImageBitmapRenderingContext if it's supported to implement
-        // XRPresentationContext; otherwise use Canvas2DRenderingContext.
-        const renderContextType = isImageBitmapSupported(global) ? 'bitmaprenderer' : '2d';
-        polyfillGetContext(global.HTMLCanvasElement, renderContextType);
+        polyfillGetContext(global.HTMLCanvasElement);
 
         // If OffscreenCanvas is available, patch its `getContext` method as well
-        // for the compatible XRDevice bit, although it cannot create an
-        // XRPresentationContext.
+        // for the compatible XRDevice bit.
         if (global.OffscreenCanvas) {
-          polyfillGetContext(global.OffscreenCanvas, null);
+          polyfillGetContext(global.OffscreenCanvas);
         }
 
         // If we needed to polyfill WebGLRenderingContext, do the same
