@@ -78,12 +78,12 @@ export default class XRView {
    *
    * Previously `getViewport` was on XRView, and after a spec change, it's now
    * available on a XRWebGLLayer. This may have to handle different types of
-   * layers in the future, and the XRLayer.getViewport() function mostly directly
+   * layers in the future, and the XRWebGLLayer.getViewport() function mostly directly
    * calls this function.
    *
    * https://github.com/immersive-web/webxr/pull/329/
    *
-   * @param {XRLayer} layer
+   * @param {XRWebGLLayer} layer
    * @return {XRViewport?}
    */
   _getViewport(layer) {

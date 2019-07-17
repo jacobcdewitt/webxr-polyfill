@@ -21,6 +21,7 @@ import XRReferenceSpace, {
   XRReferenceSpaceTypes,
   XRReferenceSpaceOptions,
 } from './XRReferenceSpace';
+import XRWebGLLayer from './XRWebGLLayer';
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRSession');
 
@@ -180,7 +181,7 @@ export default class XRSession extends EventTarget {
   }
 
   /**
-   * @return {XRLayer}
+   * @return {XRWebGLLayer}
    */
   get baseLayer() { return this[PRIVATE].baseLayer; }
 
