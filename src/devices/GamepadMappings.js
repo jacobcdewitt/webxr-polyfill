@@ -17,8 +17,11 @@
 Example Gamepad mapping. Any of the values may be omitted for the original
 gamepad values to pass through unchanged.
 
+// Chrome 76 Diff: id should instead be an array of profiles.
+
 "Gamepad ID String": { // The Gamepad.id that this entry maps to.
   mapping: 'xr-standard', // Overrides the Gamepad.mapping that is reported
+  id: 'gamepad-id-string', // The Gamepad.id that should be reported
   axes: { // Remaps the reported axes
     length: 2, // Overrides the length of the reported axes array
     0: 2, // Remaps axes[0] to report axis[2] from the original gamepad object
@@ -41,19 +44,21 @@ gamepad values to pass through unchanged.
 // Applies to both left and right Oculus Touch controllers.
 let oculusTouch = {
   mapping: 'xr-standard',
-  axes: {
+  id: 'oculus-touch',
+  // Chrome 76 Diff: Spec requires axes to be remapped as shown below for 'xr-standard'
+  /*axes: {
     length: 4,
     0: null,
     1: null,
     2: 0,
     3: 1
-  },
+  },*/
   buttons: {
     length: 6,
     0: 1,
-    1: 2,
-    2: null,
-    3: 0,
+    1: 0, // Chrome 76 Diff: Should be 2
+    2: 2, // Chrome 76 Diff: Should be null
+    3: null, // Chrome 76 Diff: Should be 0
     4: 3,
     5: 4
   },
@@ -66,13 +71,7 @@ let oculusTouch = {
 
 let windowsMixedReality = {
   mapping: 'xr-standard',
-  axes: {
-    length: 4,
-    0: 0,
-    1: 1,
-    2: 2,
-    3: 3
-  },
+  id: 'windows-mixed-reality',
   buttons: {
     length: 4,
     0: 1, // index finger trigger
@@ -93,11 +92,12 @@ let GamepadMappings = {
 
   "Oculus Go Controller": {
     mapping: 'xr-standard',
+    id: 'oculus-go',
     buttons: {
-      length: 3,
+      // length: 3, // Chrome 76 Diff: Uncomment
       0: 1,
-      1: null,
-      2: 0
+      1: 0, // Chrome 76 Diff: Should be null
+      //2: 0 // Chrome 76 Diff: Uncomment
     },
     // Grip adjustments determined experimentally.
     gripTransform: {
