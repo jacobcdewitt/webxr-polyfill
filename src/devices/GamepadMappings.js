@@ -64,6 +64,29 @@ let oculusTouch = {
   }
 };
 
+let windowsMixedReality = {
+  mapping: 'xr-standard',
+  axes: {
+    length: 4,
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3
+  },
+  buttons: {
+    length: 4,
+    0: 1, // index finger trigger
+    1: 0, // pressable joystick
+    2: 2, // grip trigger
+    3: 4, // pressable touchpad
+  },
+  // Grip adjustments determined experimentally.
+  gripTransform: {
+    position: [0, -0.02, 0.04, 1],
+    orientation: [Math.PI * 0.11, 0, 0, 1]
+  }
+};
+
 let GamepadMappings = {
   "Oculus Touch (Right)": oculusTouch,
   "Oculus Touch (Left)": oculusTouch,
@@ -80,7 +103,10 @@ let GamepadMappings = {
     gripTransform: {
       orientation: [Math.PI * 0.11, 0, 0, 1]
     }
-  }
+  },
+
+  "Windows Mixed Reality (Right)": windowsMixedReality,
+  "Windows Mixed Reality (Left)": windowsMixedReality,
 };
 
 export default GamepadMappings;
