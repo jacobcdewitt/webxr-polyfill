@@ -156,15 +156,6 @@ export default class XRReferenceSpace extends XRSpace {
   }
 
   /**
-   * @param {Float32Array} out 
-   * @param {Float32Array} baseInputPose 
-   * @param {Float32Array} basePose 
-   */
-  transformBaseInputPoseMatrix(out, baseInputPose, basePose) {
-    this.transformBasePoseMatrix(out, baseInputPose);
-  }
-
-  /**
    * NON-STANDARD
    * Takes a base view matrix and transforms it by the
    * pose matrix frame of reference.
@@ -188,16 +179,6 @@ export default class XRReferenceSpace extends XRSpace {
     }
 
     return out;
-  }
-
-  /**
-   * @return {Float32Array}
-   */
-  _getTransformToBaseSpace() {
-    let result = mat4.identity(new Float32Array(16));
-    this.transformBasePoseMatrix(result, result);
-    mat4.multiply(result, result, this[PRIVATE].originOffset);
-    return result;
   }
 
   /**

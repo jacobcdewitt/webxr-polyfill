@@ -82,8 +82,11 @@ export default class XRViewerPose {
                                          rightViewMatrix,
                                          this[PRIVATE].poseModelMatrix);
 
-      //refSpace._adjustForOriginOffset(this[PRIVATE].leftViewMatrix);
-      //refSpace._adjustForOriginOffset(this[PRIVATE].rightViewMatrix);
+      // View matrices are the inverse of the view transform, so must do
+      // matrix = matrix * originOffset
+      // instead of
+      // matrix = inv(originOffset) * matrix
+      // (which is what is done for the other transforms).
       mat4.multiply(this[PRIVATE].leftViewMatrix, this[PRIVATE].leftViewMatrix, refSpace._originOffsetMatrix());
       mat4.multiply(this[PRIVATE].rightViewMatrix, this[PRIVATE].rightViewMatrix, refSpace._originOffsetMatrix());
     }

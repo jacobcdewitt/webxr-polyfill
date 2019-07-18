@@ -238,7 +238,7 @@ export default class GamepadXRInputSource {
         return null;
     }
 
-    mat4.multiply(this.outputMatrix, coordinateSystem._inverseOriginOffsetMatrix(), this.outputMatrix);
+    coordinateSystem._adjustForOriginOffset(this.outputMatrix);
 
     return new XRPose(new XRRigidTransform(this.outputMatrix), this.emulatedPosition);
   }
