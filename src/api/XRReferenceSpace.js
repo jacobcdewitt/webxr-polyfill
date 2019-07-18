@@ -95,6 +95,7 @@ export default class XRReferenceSpace extends XRSpace {
       device,
       bounds,
       options,
+      originOffset : mat4.identity(new Float32Array(16)),
     };
     this.onboundschange = undefined;
   }
@@ -155,6 +156,15 @@ export default class XRReferenceSpace extends XRSpace {
   }
 
   /**
+   * @param {Float32Array} out 
+   * @param {Float32Array} baseInputPose 
+   * @param {Float32Array} basePose 
+   */
+  transformBaseInputPoseMatrix(out, baseInputPose, basePose) {
+    this.transformBasePoseMatrix(out, baseInputPose);
+  }
+
+  /**
    * NON-STANDARD
    * Takes a base view matrix and transforms it by the
    * pose matrix frame of reference.
@@ -181,21 +191,50 @@ export default class XRReferenceSpace extends XRSpace {
   }
 
   /**
+   * @return {Float32Array}
+   */
+  _getTransformToBaseSpace() {
+    let result = mat4.identity(new Float32Array(16));
+    this.transformBasePoseMatrix(result, result);
+    mat4.multiply(result, result, this[PRIVATE].originOffset);
+    return result;
+  }
+
+  /**
+   * @return {Float32Array}
+   */
+  _inverseOriginOffsetMatrix() {
+    let result = mat4.identity(new Float32Array(16));
+    mat4.invert(result, this[PRIVATE].originOffset);
+    return result;
+  }
+
+  _originOffsetMatrix() {
+    return this[PRIVATE].originOffset;
+  }
+
+  /**
+   * @param {Float32Array} transformMatrix 
+   */
+  _adjustForOriginOffset(transformMatrix) {
+    mat4.multiply(transformMatrix, this._inverseOriginOffsetMatrix(), transformMatrix);
+  }
+
+  /**
    * Doesn't update the bound geometry for bounded reference spaces.
-   * @param {XRRigidTransform} originOffset
+   * @param {XRRigidTransform} additionalOffset
    * @return {XRReferenceSpace}
   */
-  getOffsetReferenceSpace(originOffset) {
+  getOffsetReferenceSpace(additionalOffset) {
     let newSpace = new XRReferenceSpace(
       this[PRIVATE].device,
       this[PRIVATE].type,
       this[PRIVATE].options,
-      this[PRIVATE].transform, // Will be replaced with a new transform.
+      this[PRIVATE].transform,
       this[PRIVATE].bounds);
 
     // TODO: Might need to invert something here.
-    newSpace[PRIVATE].transform = mat4.identity(new Float32Array(16));
-    mat4.multiply(newSpace[PRIVATE].transform, this[PRIVATE].transform, originOffset.matrix);
+    mat4.multiply(newSpace[PRIVATE].originOffset, this[PRIVATE].originOffset, additionalOffset.matrix);
     return newSpace;
   }
 }

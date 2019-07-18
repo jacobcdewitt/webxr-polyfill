@@ -209,6 +209,11 @@ export default class GamepadXRInputSource {
     return this.basePoseMatrix;
   }
 
+  /**
+   * @param {XRReferenceSpace} coordinateSystem
+   * @param {string} poseType
+   * @return {XRPose?}
+   */
   getXRPose(coordinateSystem, poseType) {
     this.updateBasePoseMatrix();
 
@@ -232,6 +237,8 @@ export default class GamepadXRInputSource {
       default:
         return null;
     }
+
+    mat4.multiply(this.outputMatrix, coordinateSystem._inverseOriginOffsetMatrix(), this.outputMatrix);
 
     return new XRPose(new XRRigidTransform(this.outputMatrix), this.emulatedPosition);
   }

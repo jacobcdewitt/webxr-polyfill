@@ -71,6 +71,7 @@ export default class XRViewerPose {
 
     if (pose) {
       refSpace.transformBasePoseMatrix(this[PRIVATE].poseModelMatrix, pose);
+      refSpace._adjustForOriginOffset(this[PRIVATE].poseModelMatrix);
     }
 
     if (leftViewMatrix && rightViewMatrix) {
@@ -80,6 +81,11 @@ export default class XRViewerPose {
       refSpace.transformBaseViewMatrix(this[PRIVATE].rightViewMatrix,
                                          rightViewMatrix,
                                          this[PRIVATE].poseModelMatrix);
+
+      //refSpace._adjustForOriginOffset(this[PRIVATE].leftViewMatrix);
+      //refSpace._adjustForOriginOffset(this[PRIVATE].rightViewMatrix);
+      mat4.multiply(this[PRIVATE].leftViewMatrix, this[PRIVATE].leftViewMatrix, refSpace._originOffsetMatrix());
+      mat4.multiply(this[PRIVATE].rightViewMatrix, this[PRIVATE].rightViewMatrix, refSpace._originOffsetMatrix());
     }
 
     for (let view of this[PRIVATE].views) {
