@@ -19,7 +19,6 @@ import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRViewerPose');
 
-// TODO: Extend XRPose and set transform. Should that use poseModelMatrix?
 export default class XRViewerPose extends XRPose {
   /**
    * @param {XRDevice} device
