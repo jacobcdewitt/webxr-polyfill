@@ -71,7 +71,6 @@ export default class XRRigidTransform {
         });
     } else {
         // Compose matrix from position and orientation.
-        // TODO: Why do quaternion x,y,z values need to be negated here?
         this[PRIVATE].matrix = mat4.identity(new Float32Array(16));
         mat4.fromRotationTranslation(
           this[PRIVATE].matrix,

@@ -13,16 +13,19 @@
  * limitations under the License.
  */
 
+import XRPose from './XRPose';
+import XRRigidTransform from './XRRigidTransform';
 import * as mat4 from 'gl-matrix/src/gl-matrix/mat4';
 
 export const PRIVATE = Symbol('@@webxr-polyfill/XRViewerPose');
 
 // TODO: Extend XRPose and set transform. Should that use poseModelMatrix?
-export default class XRViewerPose {
+export default class XRViewerPose extends XRPose {
   /**
    * @param {XRDevice} device
    */
   constructor(device) {
+    super(new XRRigidTransform(), false);
     this[PRIVATE] = {
       device,
       leftViewMatrix: mat4.identity(new Float32Array(16)),
@@ -72,6 +75,10 @@ export default class XRViewerPose {
     if (pose) {
       refSpace.transformBasePoseMatrix(this[PRIVATE].poseModelMatrix, pose);
       refSpace._adjustForOriginOffset(this[PRIVATE].poseModelMatrix);
+
+      // TODO: Because XRPose.transform is [SameObject], this XRViewerPose needs
+      // to be re-created instead of updated in-place to be spec-compliant.
+      super._setTransform(new XRRigidTransform(this[PRIVATE].poseModelMatrix));
     }
 
     if (leftViewMatrix && rightViewMatrix) {
