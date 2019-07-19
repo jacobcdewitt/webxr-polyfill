@@ -25,7 +25,6 @@ import XRSpace from './XRSpace';
 import XRReferenceSpace from './XRReferenceSpace';
 import XRStageBounds from './XRStageBounds';
 import XRStageBoundsPoint from './XRStageBoundsPoint';
-import XRRay from './XRRay';
 import XRRenderState from './XRRenderState';
 import XRRigidTransform from './XRRigidTransform';
 import XRPose from './XRPose';
@@ -46,7 +45,6 @@ export default {
   XRStageBounds,
   XRStageBoundsPoint,
   XRInputSource,
-  XRRay,
   XRRenderState,
   XRRigidTransform,
   XRPose,
