@@ -65,6 +65,10 @@ export default class XRReferenceSpace extends XRSpace {
       throw new Error(`XRReferenceSpace cannot use 'bounded-floor' type, if disabling emulation and platform does not provide`);
     }
 
+    if (type === 'bounded-floor') {
+      throw new Error('The polyfill does not support creating bounded reference spaces.');
+    }
+
     const { disableStageEmulation, stageEmulationHeight } = options;
 
     let emulatedHeight = 0;
