@@ -71,16 +71,12 @@ export default class XRReferenceSpace extends XRSpace {
 
     const { disableStageEmulation, stageEmulationHeight } = options;
 
-    let emulatedHeight = 0;
     // If we're using floor-level reference and no transform, we're emulating.
     // Set emulated height from option or use the default
+    let emulatedHeight = 0;
     if (this._isFloor(type) && !transform) {
       emulatedHeight = stageEmulationHeight !== 0 ? stageEmulationHeight : DEFAULT_EMULATION_HEIGHT;
-    }
 
-    // If we're emulating the stage, and the device did not provide
-    // a transform, create one here
-    if (this._isFloor(type) && !transform) {
       // Apply emulatedHeight to the `y` translation
       transform = mat4.identity(new Float32Array(16));
       transform[13] = emulatedHeight;
@@ -138,25 +134,7 @@ export default class XRReferenceSpace extends XRSpace {
    * @param {Float32Array} pose
    */
   transformBasePoseMatrix(out, pose) {
-    // If we have a transform, it was provided by the device
-    // (probably "stage" type, but a devices could provide its own head-model)
-    // or we could be emulating a stage, in which case a transform
-    // was created in the constructor. Either way, if we have a transform, use it.
-    if (this[PRIVATE].transform) {
-      mat4.multiply(out, this[PRIVATE].transform, pose);
-      return;
-    }
-
-    switch (this.type) {
-      // For 'local', assume the pose given as eye level,
-      // so no transformation
-      case 'local':
-        if (out !== pose) {
-          mat4.copy(out, pose);
-        }
-
-        return;
-    }
+    mat4.multiply(out, this[PRIVATE].transform, pose);
   }
 
   /**
@@ -168,41 +146,25 @@ export default class XRReferenceSpace extends XRSpace {
    * @param {Float32Array} view
    */
   transformBaseViewMatrix(out, view) {
-    // If we have a transform (native or emulated stage),
-    // use it
-    let frameOfRef = this[PRIVATE].transform;
-
-    if (frameOfRef) {
-      mat4.invert(out, frameOfRef);
-      mat4.multiply(out, view, out);
-    }
-    // Otherwise don't transform the view matrix at all
-    // (like for `local` reference spaces).
-    else {
-      mat4.copy(out, view);
-    }
-
-    return out;
+    mat4.invert(out, this[PRIVATE].transform);
+    mat4.multiply(out, view, out);
   }
 
   /**
    * @return {Float32Array}
    */
-  _inverseOriginOffsetMatrix() {
-    let result = mat4.identity(new Float32Array(16));
-    mat4.invert(result, this[PRIVATE].originOffset);
-    return result;
-  }
-
   _originOffsetMatrix() {
     return this[PRIVATE].originOffset;
   }
 
   /**
+   * transformMatrix = Inv(OriginOffsetMatrix) * transformMatrix
    * @param {Float32Array} transformMatrix 
    */
   _adjustForOriginOffset(transformMatrix) {
-    mat4.multiply(transformMatrix, this._inverseOriginOffsetMatrix(), transformMatrix);
+    let inverseOriginOffsetMatrix = mat4.identity(new Float32Array(16));
+    mat4.invert(inverseOriginOffsetMatrix, this[PRIVATE].originOffset);
+    mat4.multiply(transformMatrix, inverseOriginOffsetMatrix, transformMatrix);
   }
 
   /**
@@ -218,7 +180,6 @@ export default class XRReferenceSpace extends XRSpace {
       this[PRIVATE].transform,
       this[PRIVATE].bounds);
 
-    // TODO: Might need to invert something here.
     mat4.multiply(newSpace[PRIVATE].originOffset, this[PRIVATE].originOffset, additionalOffset.matrix);
     return newSpace;
   }

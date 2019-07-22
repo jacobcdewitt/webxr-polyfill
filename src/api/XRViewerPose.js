@@ -81,20 +81,30 @@ export default class XRViewerPose extends XRPose {
     }
 
     if (leftViewMatrix && rightViewMatrix) {
-      refSpace.transformBaseViewMatrix(this[PRIVATE].leftViewMatrix,
-                                         leftViewMatrix,
-                                         this[PRIVATE].poseModelMatrix);
-      refSpace.transformBaseViewMatrix(this[PRIVATE].rightViewMatrix,
-                                         rightViewMatrix,
-                                         this[PRIVATE].poseModelMatrix);
+      refSpace.transformBaseViewMatrix(
+        this[PRIVATE].leftViewMatrix,
+        leftViewMatrix,
+        this[PRIVATE].poseModelMatrix);
+
+      refSpace.transformBaseViewMatrix(
+        this[PRIVATE].rightViewMatrix,
+        rightViewMatrix,
+        this[PRIVATE].poseModelMatrix);
 
       // View matrices are the inverse of the view transform, so must do
       // matrix = matrix * originOffset
       // instead of
       // matrix = inv(originOffset) * matrix
       // (which is what is done for the other transforms).
-      mat4.multiply(this[PRIVATE].leftViewMatrix, this[PRIVATE].leftViewMatrix, refSpace._originOffsetMatrix());
-      mat4.multiply(this[PRIVATE].rightViewMatrix, this[PRIVATE].rightViewMatrix, refSpace._originOffsetMatrix());
+      mat4.multiply(
+        this[PRIVATE].leftViewMatrix,
+        this[PRIVATE].leftViewMatrix,
+        refSpace._originOffsetMatrix());
+
+      mat4.multiply(
+        this[PRIVATE].rightViewMatrix,
+        this[PRIVATE].rightViewMatrix,
+        refSpace._originOffsetMatrix());
     }
 
     for (let view of this[PRIVATE].views) {
