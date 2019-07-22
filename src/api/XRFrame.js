@@ -26,8 +26,6 @@ export default class XRFrame {
    * @param {number} sessionId
    */
   constructor(device, session, sessionId) {
-    const viewerPose = new XRViewerPose(device);
-
     // Non-immersive sessions only have a monoscopic view.
     const views = [
       new XRView(device, 'left', sessionId),
@@ -37,11 +35,9 @@ export default class XRFrame {
       views.push(new XRView(device, 'right', sessionId));
     }
 
-    viewerPose.views = views;
-
     this[PRIVATE] = {
       device,
-      viewerPose,
+      viewerPose: new XRViewerPose(device, views),
       views,
       session,
     };
@@ -51,11 +47,6 @@ export default class XRFrame {
    * @return {XRSession} session
    */
   get session() { return this[PRIVATE].session; }
-
-  /**
-   * @return {Array<XRView>} views
-   */
-  get views() { return this[PRIVATE].views; }
 
   /**
    * @param {XRSpace} space

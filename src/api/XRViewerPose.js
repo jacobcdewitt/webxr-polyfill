@@ -23,10 +23,11 @@ export default class XRViewerPose extends XRPose {
   /**
    * @param {XRDevice} device
    */
-  constructor(device) {
+  constructor(device, views) {
     super(new XRRigidTransform(), false);
     this[PRIVATE] = {
       device,
+      views,
       leftViewMatrix: mat4.identity(new Float32Array(16)),
       rightViewMatrix: mat4.identity(new Float32Array(16)),
       poseModelMatrix: mat4.identity(new Float32Array(16)),
@@ -43,10 +44,6 @@ export default class XRViewerPose extends XRPose {
    */
   get views() {
     return this[PRIVATE].views;
-  }
-
-  set views(value) {
-    this[PRIVATE].views = value;
   }
 
   /**
