@@ -110,8 +110,6 @@ export default class XRWebGLLayer {
    * 
    * @TODO In the future maybe all this logic should be handled here instead of
    * delegated to the XRView?
-   * It's a bit difficult as this is one of the few classes directly
-   * instantiated by content rather.
    *
    * @param {XRView} view
    * @return {XRViewport?}
