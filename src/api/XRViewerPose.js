@@ -39,18 +39,6 @@ export default class XRViewerPose extends XRPose {
   get poseModelMatrix() { return this[PRIVATE].poseModelMatrix; }
 
   /**
-   * @param {XRView} view
-   * @return {Float32Array}
-   */
-  getViewMatrix(view) {
-    switch (view.eye) {
-      case 'left': return this[PRIVATE].leftViewMatrix;
-      case 'right': return this[PRIVATE].rightViewMatrix;
-    }
-    throw new Error(`view is not a valid XREye`);
-  }
-
-  /**
    * @return {Array<XRView>}
    */
   get views() {
