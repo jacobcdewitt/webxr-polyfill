@@ -58,12 +58,6 @@ export default class WebXRPolyfill {
     if (!this.nativeWebXR) {
       this._injectPolyfill(this.global);
     }
-    // If an implementation exists, on mobile, and cardboard enabled,
-    // patch `xr.requestDevice` so that we can return a cardboard display
-    // if there are no native devices
-    else if (this.config.cardboard && isMobile(this.global)) {
-      this._patchNavigatorXR();
-    }
   }
 
   _injectPolyfill(global) {
