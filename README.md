@@ -1,3 +1,10 @@
+# Branch 76
+
+This polyfill exposes the WebXR API **as implemented for the Chrome M76 origin trial (OT)** on browsers that support WebVR. This way, developers can make a WebXR page for the OT and also have it work on some other browsers, subject to a few limitations:
+* Bounded reference spaces are not supported.
+* No consent dialog is displayed before entering VR.
+* Might not follow all SameObject restrictions on interface attributes.
+
 # WebXR Polyfill
 
 [![Build Status](http://img.shields.io/travis/immersive-web/webxr-polyfill.svg?style=flat-square)](https://travis-ci.org/immersive-web/webxr-polyfill)
